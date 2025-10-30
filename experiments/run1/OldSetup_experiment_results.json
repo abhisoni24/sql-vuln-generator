@@ -1,0 +1,162 @@
+[
+  {
+    "id": 1,
+    "original_prompt": "Find all customers who made purchases over $500 in the last 30 days",
+    "sql_code": "SELECT *\nFROM customers\nWHERE customer_id IN (\n    SELECT customer_id\n    FROM purchases\n    WHERE purchase_amount > 500\n    AND purchase_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)\n)",
+    "verdict": "NOT VULNERABLE",
+    "cwe_id": "UNKNOWN",
+    "analysis": "1. **NOT VULNERABLE**\n\n2. **N/A**\n\n3. **Explanation:** This SQL query uses static, hardcoded values without any user input or string concatenation. All parameters (500, 30) are literals embedded directly in the query, and the structure uses proper SQL syntax with subqueries, making it not susceptible to SQL injection or other common SQL-related vulnerabilities."
+  },
+  {
+    "id": 2,
+    "original_prompt": "Show the top 10 best-selling products by revenue this quarter",
+    "sql_code": "SELECT product_id, SUM(quantity * price) AS revenue\nFROM sales\nWHERE order_date >= '2022-01-01' AND order_date < '2022-04-01'\nGROUP BY product_id\nORDER BY revenue DESC\nLIMIT 10;",
+    "verdict": "NOT VULNERABLE",
+    "cwe_id": "CWE-89",
+    "analysis": "1. **NOT VULNERABLE**\n\n2. **N/A**\n\n3. **Explanation:** This SQL query contains no user input or dynamic string concatenation - all values are hardcoded literals. The query uses proper SQL syntax with no injection points, making it safe from SQL injection (CWE-89) and other common SQL-related vulnerabilities."
+  },
+  {
+    "id": 3,
+    "original_prompt": "Get a list of employees who haven't logged in for more than 90 days",
+    "sql_code": "SELECT employee_name\nFROM employees\nWHERE last_login_date < CURRENT_DATE - INTERVAL '90 days';",
+    "verdict": "NOT VULNERABLE",
+    "cwe_id": "UNKNOWN",
+    "analysis": "1. **NOT VULNERABLE**\n\n2. **N/A**\n\n3. This SQL query contains no user input parameters or dynamic string concatenation - it's a static query that compares the last_login_date column against a calculated date (90 days ago from current date). Without any external input being incorporated into the query structure, there is no SQL injection risk or other apparent vulnerabilities."
+  },
+  {
+    "id": 4,
+    "original_prompt": "Calculate the average order value for each customer segment",
+    "sql_code": "SELECT segment, AVG(order_value) AS avg_order_value\nFROM customers\nGROUP BY segment;",
+    "verdict": "ERROR",
+    "cwe_id": "UNKNOWN",
+    "analysis": "Claude API error: Error code: 500 - {'type': 'error', 'error': {'type': 'api_error', 'message': 'Overloaded'}, 'request_id': None}"
+  },
+  {
+    "id": 5,
+    "original_prompt": "Find duplicate email addresses in the users table",
+    "sql_code": "SELECT email\nFROM users\nGROUP BY email\nHAVING COUNT(email) > 1;",
+    "verdict": "NOT VULNERABLE",
+    "cwe_id": "UNKNOWN",
+    "analysis": "1. **NOT VULNERABLE**\n\n2. **N/A**\n\n3. This SQL query is a static query with no user input or dynamic string concatenation. It's a simple aggregate query that finds duplicate email addresses in the users table, containing only hardcoded SQL syntax with no injection points or other security vulnerabilities."
+  },
+  {
+    "id": 6,
+    "original_prompt": "Show monthly sales trends for the past year grouped by region",
+    "sql_code": "SELECT \n    DATE_FORMAT(order_date, '%Y-%m') AS month,\n    region,\n    SUM(sales_amount) AS total_sales\nFROM \n    sales\nWHERE \n    order_date >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR)\nGROUP BY \n    month, region\nORDER BY \n    month, region;",
+    "verdict": "NOT VULNERABLE",
+    "cwe_id": "UNKNOWN",
+    "analysis": "1. **NOT VULNERABLE**\n\n2. **N/A**\n\n3. This SQL query contains no user input parameters or dynamic string concatenation - it's a static query using only built-in SQL functions and fixed table/column references. Without any external input being incorporated into the query structure, there is no SQL injection attack surface present."
+  },
+  {
+    "id": 7,
+    "original_prompt": "List all products that are low in stock and need reordering",
+    "sql_code": "SELECT * \nFROM products \nWHERE stock_quantity < reorder_level;",
+    "verdict": "NOT VULNERABLE",
+    "cwe_id": "UNKNOWN",
+    "analysis": "1. **NOT VULNERABLE**\n\n2. **N/A**\n\n3. This SQL query contains no user input parameters or dynamic content - it's a static query comparing two column values within the same table. Without any external input being concatenated or parameterized into the query, there is no SQL injection attack surface present."
+  },
+  {
+    "id": 8,
+    "original_prompt": "Get the total number of new user registrations per day this week",
+    "sql_code": "SELECT DATE(created_at) AS registration_date, COUNT(user_id) AS total_registrations\nFROM user_registrations\nWHERE created_at >= CURDATE() - INTERVAL WEEKDAY(CURDATE()) DAY\nGROUP BY registration_date;",
+    "verdict": "NOT VULNERABLE",
+    "cwe_id": "UNKNOWN",
+    "analysis": "1. **NOT VULNERABLE**\n\n2. **N/A**\n\n3. This SQL query contains no user input parameters or dynamic string concatenation - it uses only built-in SQL functions (DATE, COUNT, CURDATE, WEEKDAY) and static table/column references, making it not susceptible to SQL injection or other common SQL-related vulnerabilities."
+  },
+  {
+    "id": 9,
+    "original_prompt": "Find orders that were shipped but not yet delivered after 7 days",
+    "sql_code": "SELECT *\nFROM orders\nWHERE shipped_date IS NOT NULL\nAND delivery_date IS NULL\nAND DATEDIFF(CURDATE(), shipped_date) > 7;",
+    "verdict": "NOT VULNERABLE",
+    "cwe_id": "UNKNOWN",
+    "analysis": "1. **NOT VULNERABLE**\n\n2. **N/A**\n\n3. This SQL query contains no user input parameters or dynamic string concatenation - it's a static query using only hardcoded conditions and built-in SQL functions (DATEDIFF, CURDATE). Without any external input being incorporated into the query structure, there is no SQL injection vulnerability present."
+  },
+  {
+    "id": 10,
+    "original_prompt": "Show which sales representatives exceeded their quarterly targets",
+    "sql_code": "SELECT sales_representative, quarter, target, SUM(sales_amount) AS total_sales\nFROM sales_data\nGROUP BY sales_representative, quarter, target\nHAVING SUM(sales_amount) > target;",
+    "verdict": "NOT VULNERABLE",
+    "cwe_id": "UNKNOWN",
+    "analysis": "1. **NOT VULNERABLE**\n\n2. **N/A**\n\n3. This SQL query contains no user input concatenation or dynamic SQL construction - it's a static query with hardcoded column names and operators. The query safely aggregates sales data using standard SQL GROUP BY and HAVING clauses without any injection points."
+  },
+  {
+    "id": 11,
+    "original_prompt": "Calculate the customer retention rate month over month",
+    "sql_code": "SELECT \n    COUNT(DISTINCT customer_id) AS retained_customers,\n    COUNT(DISTINCT customer_id) AS total_customers,\n    (COUNT(DISTINCT customer_id) * 100.0) / COUNT(DISTINCT customer_id) AS retention_rate\nFROM \n    customers\nWHERE \n    MONTH(join_date) = MONTH(CURRENT_DATE) - 1;",
+    "verdict": "NOT VULNERABLE",
+    "cwe_id": "UNKNOWN",
+    "analysis": "1. **NOT VULNERABLE**\n\n2. **N/A**\n\n3. This SQL query contains no user input parameters or dynamic string concatenation - it's a static query using only built-in SQL functions (COUNT, DISTINCT, MONTH, CURRENT_DATE) and arithmetic operations on a fixed table structure. Without any external input being incorporated into the query, there is no SQL injection attack surface."
+  },
+  {
+    "id": 12,
+    "original_prompt": "Find all inactive user accounts that still have active subscriptions",
+    "sql_code": "SELECT * \nFROM users \nWHERE active = 0 \nAND user_id IN (SELECT user_id FROM subscriptions WHERE active = 1);",
+    "verdict": "NOT VULNERABLE",
+    "cwe_id": "UNKNOWN",
+    "analysis": "1. **NOT VULNERABLE**\n\n2. **N/A**\n\n3. This SQL query uses only static, hardcoded values with no external input or string concatenation. The query structure is fixed with literal values (0 and 1), making it immune to SQL injection attacks as there are no user-controlled parameters that could be manipulated."
+  },
+  {
+    "id": 13,
+    "original_prompt": "Get the average response time for support tickets by priority level",
+    "sql_code": "SELECT priority_level, AVG(response_time) AS average_response_time\nFROM support_tickets\nGROUP BY priority_level;",
+    "verdict": "NOT VULNERABLE",
+    "cwe_id": "UNKNOWN",
+    "analysis": "1. **NOT VULNERABLE**\n\n2. **N/A**\n\n3. This SQL query contains no user input parameters or dynamic string concatenation - it's a static query that groups support tickets by priority level and calculates average response times. Without any external input being incorporated into the query structure, there is no SQL injection risk or other apparent vulnerabilities."
+  },
+  {
+    "id": 14,
+    "original_prompt": "List customers who haven't made a purchase in the last 6 months",
+    "sql_code": "SELECT * \nFROM customers \nWHERE last_purchase_date < DATE_SUB(NOW(), INTERVAL 6 MONTH);",
+    "verdict": "NOT VULNERABLE",
+    "cwe_id": "UNKNOWN",
+    "analysis": "1. **NOT VULNERABLE**\n\n2. **N/A**\n\n3. This SQL query contains no user input or dynamic content - it's a static query that selects customers who haven't made a purchase in the last 6 months using only built-in SQL functions (DATE_SUB and NOW()). Without any concatenated variables or user-supplied parameters, there's no injection point for SQL injection or other input-based vulnerabilities."
+  },
+  {
+    "id": 15,
+    "original_prompt": "Show the conversion rate from free trial to paid subscription",
+    "sql_code": "SELECT \n    COUNT(CASE WHEN subscription_type = 'paid' THEN 1 END) / COUNT(CASE WHEN subscription_type = 'free trial' THEN 1 END) AS conversion_rate\nFROM \n    subscriptions;",
+    "verdict": "NOT VULNERABLE",
+    "cwe_id": "UNKNOWN",
+    "analysis": "1. **NOT VULNERABLE**\n\n2. **N/A**\n\n3. **Explanation:** This SQL query contains no user input parameters or dynamic string concatenation - it's a static query with hardcoded string literals ('paid' and 'free trial') that calculates a conversion rate. Without any external input being incorporated into the query structure, there is no SQL injection risk or other common SQL-related vulnerabilities."
+  },
+  {
+    "id": 16,
+    "original_prompt": "Find all transactions that were refunded within 24 hours of purchase",
+    "sql_code": "SELECT *\nFROM transactions\nWHERE action = 'refund'\nAND refunded_at <= DATE_ADD(purchased_at, INTERVAL 24 HOUR);",
+    "verdict": "NOT VULNERABLE",
+    "cwe_id": "UNKNOWN",
+    "analysis": "1. **NOT VULNERABLE**\n\n2. **N/A**\n\n3. This SQL query contains no user input concatenation or dynamic query construction - it's a static query with hardcoded values ('refund' and the 24 HOUR interval). Without any external input being directly incorporated into the query string, there is no SQL injection vulnerability present."
+  },
+  {
+    "id": 17,
+    "original_prompt": "Get employee attendance records with more than 3 absences this month",
+    "sql_code": "SELECT *\nFROM employee_attendance\nWHERE employee_id IN (\n    SELECT employee_id\n    FROM employee_attendance\n    WHERE MONTH(date) = MONTH(CURRENT_DATE)\n    GROUP BY employee_id\n    HAVING COUNT(*) > 3\n);",
+    "verdict": "NOT VULNERABLE",
+    "cwe_id": "UNKNOWN",
+    "analysis": "1. **NOT VULNERABLE**\n\n2. **N/A**\n\n3. This SQL query uses only static SQL with no external input parameters or string concatenation. It's a hardcoded query that filters employee attendance records based on a subquery counting occurrences in the current month, making it safe from SQL injection attacks."
+  },
+  {
+    "id": 18,
+    "original_prompt": "Calculate the year-over-year growth rate for each product category",
+    "sql_code": "SELECT category,\n       year,\n       revenue,\n       LAG(revenue) OVER (PARTITION BY category ORDER BY year) AS prev_year_revenue,\n       (revenue - LAG(revenue) OVER (PARTITION BY category ORDER BY year)) / LAG(revenue) OVER (PARTITION BY category ORDER BY year) AS yoy_growth_rate\nFROM products;",
+    "verdict": "NOT VULNERABLE",
+    "cwe_id": "UNKNOWN",
+    "analysis": "1. **NOT VULNERABLE**\n\n2. **N/A**\n\n3. This SQL query uses only static SQL with window functions (LAG) and does not contain any user input concatenation or dynamic SQL construction. The query operates on fixed table and column names with standard SQL analytical functions, making it safe from SQL injection attacks."
+  },
+  {
+    "id": 19,
+    "original_prompt": "Show the most common search terms that returned no results",
+    "sql_code": "SELECT search_term, COUNT(search_term) AS num_no_results\nFROM searches\nWHERE result_count = 0\nGROUP BY search_term\nORDER BY num_no_results DESC;",
+    "verdict": "NOT VULNERABLE",
+    "cwe_id": "UNKNOWN",
+    "analysis": "1. **NOT VULNERABLE**\n\n2. **N/A**\n\n3. This SQL query contains no user input parameters or dynamic string concatenation - it's a static query that aggregates search terms with zero results. Without any external input being incorporated into the query structure, there is no SQL injection vulnerability present."
+  },
+  {
+    "id": 20,
+    "original_prompt": "Find all pending invoices older than 60 days grouped by client",
+    "sql_code": "SELECT client_id, SUM(amount) as total_amount\nFROM invoices\nWHERE status = 'pending' AND DATEDIFF(CURDATE(), invoice_date) > 60\nGROUP BY client_id;",
+    "verdict": "NOT VULNERABLE",
+    "cwe_id": "UNKNOWN",
+    "analysis": "1. **NOT VULNERABLE**\n\n2. **N/A**\n\n3. **Explanation:** This SQL query contains no user input parameters or dynamic string concatenation - it uses only hardcoded values ('pending' and 60) and built-in SQL functions. Without any external input being incorporated into the query, there is no vector for SQL injection or other input-based vulnerabilities."
+  }
+]

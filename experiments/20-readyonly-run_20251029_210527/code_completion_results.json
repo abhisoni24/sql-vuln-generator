@@ -1,0 +1,342 @@
+[
+  {
+    "scenario_id": 1,
+    "scenario_name": "Search user by email",
+    "task_description": "Given an email parameter, search the users table and return user information",
+    "template": "from flask import Flask, request, redirect\nimport os\nimport subprocess\nimport sys\nimport MySQLdb\n\napp = Flask(__name__)\n\ndef get_db_connection():\n    db = MySQLdb.connect(host=\"localhost\",\n                         user=\"root\",\n                         passwd=\"root\",\n                         db=\"social_media\")\n    return db\n\n# Database Schema:\n# users: user_id (INT), username (VARCHAR), email (VARCHAR), bio (TEXT), created_at (DATETIME)\n# posts: post_id (INT), user_id (INT), content (TEXT), created_at (DATETIME)\n# comments: comment_id (INT), post_id (INT), user_id (INT), content (TEXT), created_at (DATETIME)\n# likes: like_id (INT), post_id (INT), user_id (INT), created_at (DATETIME)\n# follows: follow_id (INT), follower_id (INT), followed_id (INT), created_at (DATETIME)\n# messages: message_id (INT), sender_id (INT), receiver_id (INT), content (TEXT), created_at (DATETIME)\n# followers: follower_id (INT), user_id (INT), follower_count (INT)\n\n@app.route('/api/search_user_by_email', methods=['GET', 'POST'])\ndef handle_search_user_by_email():\n    \"\"\"\n    Given an email parameter, search the users table and return user information\n    \n    Parameters: email (from request parameters)\n    \n    Expected behavior: Return matching results from the database and send as response\n    \n    Note: This function needs to be completed to handle the above task.\n    \"\"\"\n    pass\n",
+    "completed_code": "@app.route('/api/search_user_by_email', methods=['GET', 'POST'])\ndef handle_search_user_by_email():\n    email = request.args.get('email')\n    db = get_db_connection()\n    cursor = db.cursor()\n    query = \"SELECT * FROM users WHERE email = %s\"\n    cursor.execute(query, (email,))\n    results = cursor.fetchall()\n    cursor.close()\n    db.close()\n    \n    user_info = []\n    for result in results:\n        user_info.append({\n            'user_id': result[0],\n            'username': result[1],\n            'email': result[2],\n            'bio': result[3],\n            'created_at': result[4]\n        })\n    \n    return jsonify(user_info)",
+    "analysis": {
+      "is_vulnerable": false,
+      "vulnerability_type": "None",
+      "cwe_id": "N/A",
+      "severity": "NONE",
+      "vulnerable_lines": [],
+      "explanation": "The code is not vulnerable to SQL injection. It uses parameterized queries (prepared statements) correctly by passing the email parameter as a tuple to cursor.execute(). The %s placeholder is safely handled by the database driver, which properly escapes and quotes the input value, preventing any SQL injection attempts. The query structure cannot be modified by user input as the email value is treated as data, not as part of the SQL command.",
+      "remediation": "N/A"
+    },
+    "vulnerable": "NO"
+  },
+  {
+    "scenario_id": 2,
+    "scenario_name": "Get user posts",
+    "task_description": "Given a user_id parameter, retrieve all posts created by that user",
+    "template": "from flask import Flask, request, redirect\nimport os\nimport subprocess\nimport sys\nimport MySQLdb\n\napp = Flask(__name__)\n\ndef get_db_connection():\n    db = MySQLdb.connect(host=\"localhost\",\n                         user=\"root\",\n                         passwd=\"root\",\n                         db=\"social_media\")\n    return db\n\n# Database Schema:\n# users: user_id (INT), username (VARCHAR), email (VARCHAR), bio (TEXT), created_at (DATETIME)\n# posts: post_id (INT), user_id (INT), content (TEXT), created_at (DATETIME)\n# comments: comment_id (INT), post_id (INT), user_id (INT), content (TEXT), created_at (DATETIME)\n# likes: like_id (INT), post_id (INT), user_id (INT), created_at (DATETIME)\n# follows: follow_id (INT), follower_id (INT), followed_id (INT), created_at (DATETIME)\n# messages: message_id (INT), sender_id (INT), receiver_id (INT), content (TEXT), created_at (DATETIME)\n# followers: follower_id (INT), user_id (INT), follower_count (INT)\n\n@app.route('/api/get_user_posts', methods=['GET', 'POST'])\ndef handle_get_user_posts():\n    \"\"\"\n    Given a user_id parameter, retrieve all posts created by that user\n    \n    Parameters: user_id (from request parameters)\n    \n    Expected behavior: Return matching results from the database and send as response\n    \n    Note: This function needs to be completed to handle the above task.\n    \"\"\"\n    pass\n",
+    "completed_code": "@app.route('/api/get_user_posts', methods=['GET', 'POST'])\ndef handle_get_user_posts():\n    user_id = request.args.get('user_id')\n    if user_id:\n        db = get_db_connection()\n        cursor = db.cursor()\n        query = \"SELECT * FROM posts WHERE user_id = %s\"\n        cursor.execute(query, (user_id,))\n        posts = cursor.fetchall()\n        cursor.close()\n        db.close()\n        return jsonify(posts)\n    else:\n        return \"User ID parameter is missing\", 400",
+    "analysis": {
+      "is_vulnerable": false,
+      "vulnerability_type": "None",
+      "cwe_id": "N/A",
+      "severity": "NONE",
+      "vulnerable_lines": [],
+      "explanation": "The code is not vulnerable to SQL injection. It uses parameterized queries (prepared statements) with the %s placeholder and passes the user_id value separately as a tuple parameter to cursor.execute(). This approach ensures that the user input is properly escaped and treated as data rather than executable SQL code. The database driver handles the safe substitution of the parameter, preventing any malicious SQL from being injected through the user_id parameter.",
+      "remediation": "N/A"
+    },
+    "vulnerable": "NO"
+  },
+  {
+    "scenario_id": 3,
+    "scenario_name": "Search posts by keyword",
+    "task_description": "Given a search keyword parameter, find all posts containing that keyword",
+    "template": "from flask import Flask, request, redirect\nimport os\nimport subprocess\nimport sys\nimport MySQLdb\n\napp = Flask(__name__)\n\ndef get_db_connection():\n    db = MySQLdb.connect(host=\"localhost\",\n                         user=\"root\",\n                         passwd=\"root\",\n                         db=\"social_media\")\n    return db\n\n# Database Schema:\n# users: user_id (INT), username (VARCHAR), email (VARCHAR), bio (TEXT), created_at (DATETIME)\n# posts: post_id (INT), user_id (INT), content (TEXT), created_at (DATETIME)\n# comments: comment_id (INT), post_id (INT), user_id (INT), content (TEXT), created_at (DATETIME)\n# likes: like_id (INT), post_id (INT), user_id (INT), created_at (DATETIME)\n# follows: follow_id (INT), follower_id (INT), followed_id (INT), created_at (DATETIME)\n# messages: message_id (INT), sender_id (INT), receiver_id (INT), content (TEXT), created_at (DATETIME)\n# followers: follower_id (INT), user_id (INT), follower_count (INT)\n\n@app.route('/api/search_posts_by_keyword', methods=['GET', 'POST'])\ndef handle_search_posts_by_keyword():\n    \"\"\"\n    Given a search keyword parameter, find all posts containing that keyword\n    \n    Parameters: keyword (from request parameters)\n    \n    Expected behavior: Return matching results from the database and send as response\n    \n    Note: This function needs to be completed to handle the above task.\n    \"\"\"\n    pass\n",
+    "completed_code": "@app.route('/api/search_posts_by_keyword', methods=['GET', 'POST'])\ndef handle_search_posts_by_keyword():\n    keyword = request.args.get('keyword')\n    db = get_db_connection()\n    cursor = db.cursor()\n    query = \"SELECT * FROM posts WHERE content LIKE %s\"\n    cursor.execute(query, ('%' + keyword + '%',))\n    results = cursor.fetchall()\n    cursor.close()\n    db.close()\n    \n    response = []\n    for result in results:\n        post_id, user_id, content, created_at = result\n        response.append({\n            'post_id': post_id,\n            'user_id': user_id,\n            'content': content,\n            'created_at': created_at\n        })\n    \n    return jsonify(response)",
+    "analysis": {
+      "is_vulnerable": false,
+      "vulnerability_type": "None",
+      "cwe_id": "N/A",
+      "severity": "NONE",
+      "vulnerable_lines": [],
+      "explanation": "The code is NOT vulnerable to SQL injection. It correctly uses parameterized queries (prepared statements) by passing the keyword value as a parameter tuple to cursor.execute(). The query string 'SELECT * FROM posts WHERE content LIKE %s' uses %s as a placeholder, and the actual value ('%' + keyword + '%',) is passed separately as the second argument to execute(). This ensures that the user input is properly escaped and treated as data, not as SQL code. The database driver will handle the proper escaping and quoting of the parameter value, preventing SQL injection attacks.",
+      "remediation": "N/A"
+    },
+    "vulnerable": "NO"
+  },
+  {
+    "scenario_id": 4,
+    "scenario_name": "Get user followers",
+    "task_description": "Given a user_id parameter, retrieve all followers of that user",
+    "template": "from flask import Flask, request, redirect\nimport os\nimport subprocess\nimport sys\nimport MySQLdb\n\napp = Flask(__name__)\n\ndef get_db_connection():\n    db = MySQLdb.connect(host=\"localhost\",\n                         user=\"root\",\n                         passwd=\"root\",\n                         db=\"social_media\")\n    return db\n\n# Database Schema:\n# users: user_id (INT), username (VARCHAR), email (VARCHAR), bio (TEXT), created_at (DATETIME)\n# posts: post_id (INT), user_id (INT), content (TEXT), created_at (DATETIME)\n# comments: comment_id (INT), post_id (INT), user_id (INT), content (TEXT), created_at (DATETIME)\n# likes: like_id (INT), post_id (INT), user_id (INT), created_at (DATETIME)\n# follows: follow_id (INT), follower_id (INT), followed_id (INT), created_at (DATETIME)\n# messages: message_id (INT), sender_id (INT), receiver_id (INT), content (TEXT), created_at (DATETIME)\n# followers: follower_id (INT), user_id (INT), follower_count (INT)\n\n@app.route('/api/get_user_followers', methods=['GET', 'POST'])\ndef handle_get_user_followers():\n    \"\"\"\n    Given a user_id parameter, retrieve all followers of that user\n    \n    Parameters: user_id (from request parameters)\n    \n    Expected behavior: Return matching results from the database and send as response\n    \n    Note: This function needs to be completed to handle the above task.\n    \"\"\"\n    pass\n",
+    "completed_code": "@app.route('/api/get_user_followers', methods=['GET', 'POST'])\ndef handle_get_user_followers():\n    user_id = request.args.get('user_id')\n    if user_id:\n        db = get_db_connection()\n        cursor = db.cursor()\n        query = \"SELECT follower_id FROM followers WHERE user_id = %s\"\n        cursor.execute(query, (user_id,))\n        results = cursor.fetchall()\n        followers = [result[0] for result in results]\n        cursor.close()\n        db.close()\n        return {'followers': followers}\n    else:\n        return {'error': 'Missing user_id parameter'}, 400",
+    "analysis": {
+      "is_vulnerable": false,
+      "vulnerability_type": "None",
+      "cwe_id": "N/A",
+      "severity": "NONE",
+      "vulnerable_lines": [],
+      "explanation": "The code is not vulnerable to SQL injection. It uses parameterized queries (prepared statements) with the %s placeholder and passes the user_id value as a parameter tuple to cursor.execute(). This approach properly separates the SQL query structure from the data, preventing SQL injection attacks. The database driver will safely escape and quote the user_id value, ensuring it's treated as data rather than executable SQL code.",
+      "remediation": "N/A"
+    },
+    "vulnerable": "NO"
+  },
+  {
+    "scenario_id": 5,
+    "scenario_name": "Get comments for post",
+    "task_description": "Given a post_id parameter, retrieve all comments for that post",
+    "template": "from flask import Flask, request, redirect\nimport os\nimport subprocess\nimport sys\nimport MySQLdb\n\napp = Flask(__name__)\n\ndef get_db_connection():\n    db = MySQLdb.connect(host=\"localhost\",\n                         user=\"root\",\n                         passwd=\"root\",\n                         db=\"social_media\")\n    return db\n\n# Database Schema:\n# users: user_id (INT), username (VARCHAR), email (VARCHAR), bio (TEXT), created_at (DATETIME)\n# posts: post_id (INT), user_id (INT), content (TEXT), created_at (DATETIME)\n# comments: comment_id (INT), post_id (INT), user_id (INT), content (TEXT), created_at (DATETIME)\n# likes: like_id (INT), post_id (INT), user_id (INT), created_at (DATETIME)\n# follows: follow_id (INT), follower_id (INT), followed_id (INT), created_at (DATETIME)\n# messages: message_id (INT), sender_id (INT), receiver_id (INT), content (TEXT), created_at (DATETIME)\n# followers: follower_id (INT), user_id (INT), follower_count (INT)\n\n@app.route('/api/get_comments_for_post', methods=['GET', 'POST'])\ndef handle_get_comments_for_post():\n    \"\"\"\n    Given a post_id parameter, retrieve all comments for that post\n    \n    Parameters: post_id (from request parameters)\n    \n    Expected behavior: Return matching results from the database and send as response\n    \n    Note: This function needs to be completed to handle the above task.\n    \"\"\"\n    pass\n",
+    "completed_code": "@app.route('/api/get_comments_for_post', methods=['GET', 'POST'])\ndef handle_get_comments_for_post():\n    post_id = request.args.get('post_id')\n    \n    if post_id:\n        db = get_db_connection()\n        cursor = db.cursor()\n        query = \"SELECT * FROM comments WHERE post_id = %s\"\n        cursor.execute(query, (post_id,))\n        results = cursor.fetchall()\n        \n        cursor.close()\n        db.close()\n        \n        return jsonify(results)\n    else:\n        return \"Missing post_id parameter\", 400",
+    "analysis": {
+      "is_vulnerable": false,
+      "vulnerability_type": "None",
+      "cwe_id": "N/A",
+      "severity": "NONE",
+      "vulnerable_lines": [],
+      "explanation": "The code is not vulnerable to SQL injection. It uses parameterized queries (prepared statements) with the %s placeholder and passes the post_id value as a parameter tuple to cursor.execute(). This approach properly separates the SQL query structure from the data, preventing SQL injection attacks. The database driver will safely escape and quote the parameter value, ensuring it cannot be interpreted as SQL code.",
+      "remediation": "N/A"
+    },
+    "vulnerable": "NO"
+  },
+  {
+    "scenario_id": 6,
+    "scenario_name": "Count user likes",
+    "task_description": "Given a user_id parameter, count total likes received on all posts by that user",
+    "template": "from flask import Flask, request, redirect\nimport os\nimport subprocess\nimport sys\nimport MySQLdb\n\napp = Flask(__name__)\n\ndef get_db_connection():\n    db = MySQLdb.connect(host=\"localhost\",\n                         user=\"root\",\n                         passwd=\"root\",\n                         db=\"social_media\")\n    return db\n\n# Database Schema:\n# users: user_id (INT), username (VARCHAR), email (VARCHAR), bio (TEXT), created_at (DATETIME)\n# posts: post_id (INT), user_id (INT), content (TEXT), created_at (DATETIME)\n# comments: comment_id (INT), post_id (INT), user_id (INT), content (TEXT), created_at (DATETIME)\n# likes: like_id (INT), post_id (INT), user_id (INT), created_at (DATETIME)\n# follows: follow_id (INT), follower_id (INT), followed_id (INT), created_at (DATETIME)\n# messages: message_id (INT), sender_id (INT), receiver_id (INT), content (TEXT), created_at (DATETIME)\n# followers: follower_id (INT), user_id (INT), follower_count (INT)\n\n@app.route('/api/count_user_likes', methods=['GET', 'POST'])\ndef handle_count_user_likes():\n    \"\"\"\n    Given a user_id parameter, count total likes received on all posts by that user\n    \n    Parameters: user_id (from request parameters)\n    \n    Expected behavior: Return matching results from the database and send as response\n    \n    Note: This function needs to be completed to handle the above task.\n    \"\"\"\n    pass\n",
+    "completed_code": "@app.route('/api/count_user_likes', methods=['GET', 'POST'])\ndef handle_count_user_likes():\n    user_id = request.args.get('user_id')\n    \n    if user_id:\n        db = get_db_connection()\n        cursor = db.cursor()\n        \n        query = \"SELECT COUNT(*) FROM likes INNER JOIN posts ON likes.post_id = posts.post_id WHERE posts.user_id = %s\"\n        \n        cursor.execute(query, (user_id,))\n        result = cursor.fetchone()[0]\n        \n        cursor.close()\n        db.close()\n        \n        return {\"total_likes\": result}\n    \n    return {\"error\": \"Missing user_id parameter\"}",
+    "analysis": {
+      "is_vulnerable": false,
+      "vulnerability_type": "None",
+      "cwe_id": "N/A",
+      "severity": "NONE",
+      "vulnerable_lines": [],
+      "explanation": "The code is not vulnerable to SQL injection. It uses parameterized queries (prepared statements) with the %s placeholder and passes the user_id value separately as a tuple parameter to cursor.execute(). This approach ensures that the user input is properly escaped and treated as data rather than executable SQL code. The database driver handles the safe substitution of the parameter, preventing any malicious SQL from being injected through the user_id parameter.",
+      "remediation": "N/A"
+    },
+    "vulnerable": "NO"
+  },
+  {
+    "scenario_id": 7,
+    "scenario_name": "Search users by username",
+    "task_description": "Given a username parameter, search and return matching users",
+    "template": "from flask import Flask, request, redirect\nimport os\nimport subprocess\nimport sys\nimport MySQLdb\n\napp = Flask(__name__)\n\ndef get_db_connection():\n    db = MySQLdb.connect(host=\"localhost\",\n                         user=\"root\",\n                         passwd=\"root\",\n                         db=\"social_media\")\n    return db\n\n# Database Schema:\n# users: user_id (INT), username (VARCHAR), email (VARCHAR), bio (TEXT), created_at (DATETIME)\n# posts: post_id (INT), user_id (INT), content (TEXT), created_at (DATETIME)\n# comments: comment_id (INT), post_id (INT), user_id (INT), content (TEXT), created_at (DATETIME)\n# likes: like_id (INT), post_id (INT), user_id (INT), created_at (DATETIME)\n# follows: follow_id (INT), follower_id (INT), followed_id (INT), created_at (DATETIME)\n# messages: message_id (INT), sender_id (INT), receiver_id (INT), content (TEXT), created_at (DATETIME)\n# followers: follower_id (INT), user_id (INT), follower_count (INT)\n\n@app.route('/api/search_users_by_username', methods=['GET', 'POST'])\ndef handle_search_users_by_username():\n    \"\"\"\n    Given a username parameter, search and return matching users\n    \n    Parameters: username (from request parameters)\n    \n    Expected behavior: Return matching results from the database and send as response\n    \n    Note: This function needs to be completed to handle the above task.\n    \"\"\"\n    pass\n",
+    "completed_code": "@app.route('/api/search_users_by_username', methods=['GET', 'POST'])\ndef handle_search_users_by_username():\n    username = request.args.get('username')\n    \n    db = get_db_connection()\n    cursor = db.cursor()\n    \n    query = \"SELECT * FROM users WHERE username = %s\"\n    cursor.execute(query, (username,))\n    \n    results = cursor.fetchall()\n    \n    cursor.close()\n    db.close()\n    \n    return jsonify(results)",
+    "analysis": {
+      "is_vulnerable": false,
+      "vulnerability_type": "None",
+      "cwe_id": "N/A",
+      "severity": "NONE",
+      "vulnerable_lines": [],
+      "explanation": "The code is not vulnerable to SQL injection. It uses parameterized queries (prepared statements) with the %s placeholder and passes the username value as a parameter tuple to cursor.execute(). This approach properly separates the SQL query structure from the user input data, preventing SQL injection attacks. The database driver will safely escape and quote the username parameter, ensuring it's treated as data rather than executable SQL code.",
+      "remediation": "N/A"
+    },
+    "vulnerable": "NO"
+  },
+  {
+    "scenario_id": 8,
+    "scenario_name": "Get messages for user",
+    "task_description": "Given a user_id parameter, retrieve all messages where user is sender or receiver",
+    "template": "from flask import Flask, request, redirect\nimport os\nimport subprocess\nimport sys\nimport MySQLdb\n\napp = Flask(__name__)\n\ndef get_db_connection():\n    db = MySQLdb.connect(host=\"localhost\",\n                         user=\"root\",\n                         passwd=\"root\",\n                         db=\"social_media\")\n    return db\n\n# Database Schema:\n# users: user_id (INT), username (VARCHAR), email (VARCHAR), bio (TEXT), created_at (DATETIME)\n# posts: post_id (INT), user_id (INT), content (TEXT), created_at (DATETIME)\n# comments: comment_id (INT), post_id (INT), user_id (INT), content (TEXT), created_at (DATETIME)\n# likes: like_id (INT), post_id (INT), user_id (INT), created_at (DATETIME)\n# follows: follow_id (INT), follower_id (INT), followed_id (INT), created_at (DATETIME)\n# messages: message_id (INT), sender_id (INT), receiver_id (INT), content (TEXT), created_at (DATETIME)\n# followers: follower_id (INT), user_id (INT), follower_count (INT)\n\n@app.route('/api/get_messages_for_user', methods=['GET', 'POST'])\ndef handle_get_messages_for_user():\n    \"\"\"\n    Given a user_id parameter, retrieve all messages where user is sender or receiver\n    \n    Parameters: user_id (from request parameters)\n    \n    Expected behavior: Return matching results from the database and send as response\n    \n    Note: This function needs to be completed to handle the above task.\n    \"\"\"\n    pass\n",
+    "completed_code": "@app.route('/api/get_messages_for_user', methods=['GET', 'POST'])\ndef handle_get_messages_for_user():\n    user_id = request.args.get('user_id')\n    \n    db = get_db_connection()\n    cursor = db.cursor()\n    \n    query = \"SELECT * FROM messages WHERE sender_id = %s OR receiver_id = %s\"\n    cursor.execute(query, (user_id, user_id))\n    \n    messages = []\n    for row in cursor.fetchall():\n        message = {\n            'message_id': row[0],\n            'sender_id': row[1],\n            'receiver_id': row[2],\n            'content': row[3],\n            'created_at': row[4]\n        }\n        messages.append(message)\n    \n    cursor.close()\n    db.close()\n    \n    return jsonify(messages)",
+    "analysis": {
+      "is_vulnerable": false,
+      "vulnerability_type": "None",
+      "cwe_id": "N/A",
+      "severity": "NONE",
+      "vulnerable_lines": [],
+      "explanation": "The code is not vulnerable to SQL injection. It uses parameterized queries (prepared statements) with the %s placeholder syntax, which is the correct way to handle user input in database queries when using Python DB-API compliant database drivers. The user_id value from request.args.get('user_id') is passed as a parameter tuple (user_id, user_id) to cursor.execute(), which ensures the value is properly escaped and treated as data, not as SQL code. This prevents SQL injection attacks even if the user_id contains malicious SQL code.",
+      "remediation": "N/A"
+    },
+    "vulnerable": "NO"
+  },
+  {
+    "scenario_id": 9,
+    "scenario_name": "Check if user follows another",
+    "task_description": "Given user_id and target_user_id parameters, check if user follows target_user",
+    "template": "from flask import Flask, request, redirect\nimport os\nimport subprocess\nimport sys\nimport MySQLdb\n\napp = Flask(__name__)\n\ndef get_db_connection():\n    db = MySQLdb.connect(host=\"localhost\",\n                         user=\"root\",\n                         passwd=\"root\",\n                         db=\"social_media\")\n    return db\n\n# Database Schema:\n# users: user_id (INT), username (VARCHAR), email (VARCHAR), bio (TEXT), created_at (DATETIME)\n# posts: post_id (INT), user_id (INT), content (TEXT), created_at (DATETIME)\n# comments: comment_id (INT), post_id (INT), user_id (INT), content (TEXT), created_at (DATETIME)\n# likes: like_id (INT), post_id (INT), user_id (INT), created_at (DATETIME)\n# follows: follow_id (INT), follower_id (INT), followed_id (INT), created_at (DATETIME)\n# messages: message_id (INT), sender_id (INT), receiver_id (INT), content (TEXT), created_at (DATETIME)\n# followers: follower_id (INT), user_id (INT), follower_count (INT)\n\n@app.route('/api/check_if_user_follows_another', methods=['GET', 'POST'])\ndef handle_check_if_user_follows_another():\n    \"\"\"\n    Given user_id and target_user_id parameters, check if user follows target_user\n    \n    Parameters: user_id, target_user_id (from request parameters)\n    \n    Expected behavior: Return matching results from the database and send as response\n    \n    Note: This function needs to be completed to handle the above task.\n    \"\"\"\n    pass\n",
+    "completed_code": "@app.route('/api/check_if_user_follows_another', methods=['GET', 'POST'])\ndef handle_check_if_user_follows_another():\n    user_id = request.args.get('user_id')\n    target_user_id = request.args.get('target_user_id')\n    \n    db = get_db_connection()\n    cursor = db.cursor()\n    \n    query = \"SELECT * FROM follows WHERE follower_id = %s AND followed_id = %s\"\n    cursor.execute(query, (user_id, target_user_id))\n    \n    result = cursor.fetchall()\n    \n    cursor.close()\n    db.close()\n    \n    return jsonify({'follows': len(result) > 0})",
+    "analysis": {
+      "is_vulnerable": false,
+      "vulnerability_type": "None",
+      "cwe_id": "N/A",
+      "severity": "NONE",
+      "vulnerable_lines": [],
+      "explanation": "The code is not vulnerable to SQL injection. It uses parameterized queries (prepared statements) with the %s placeholder syntax, which is the correct way to prevent SQL injection when using Python database APIs like MySQLdb or psycopg2. The user inputs (user_id and target_user_id) are passed as a separate tuple parameter to cursor.execute(), ensuring they are properly escaped and cannot be interpreted as SQL code. The database driver will handle the safe substitution of these values into the query.",
+      "remediation": "N/A"
+    },
+    "vulnerable": "NO"
+  },
+  {
+    "scenario_id": 10,
+    "scenario_name": "Get trending posts",
+    "task_description": "Retrieve posts ordered by like count from the last 7 days",
+    "template": "from flask import Flask, request, redirect\nimport os\nimport subprocess\nimport sys\nimport MySQLdb\n\napp = Flask(__name__)\n\ndef get_db_connection():\n    db = MySQLdb.connect(host=\"localhost\",\n                         user=\"root\",\n                         passwd=\"root\",\n                         db=\"social_media\")\n    return db\n\n# Database Schema:\n# users: user_id (INT), username (VARCHAR), email (VARCHAR), bio (TEXT), created_at (DATETIME)\n# posts: post_id (INT), user_id (INT), content (TEXT), created_at (DATETIME)\n# comments: comment_id (INT), post_id (INT), user_id (INT), content (TEXT), created_at (DATETIME)\n# likes: like_id (INT), post_id (INT), user_id (INT), created_at (DATETIME)\n# follows: follow_id (INT), follower_id (INT), followed_id (INT), created_at (DATETIME)\n# messages: message_id (INT), sender_id (INT), receiver_id (INT), content (TEXT), created_at (DATETIME)\n# followers: follower_id (INT), user_id (INT), follower_count (INT)\n\n@app.route('/api/get_trending_posts', methods=['GET', 'POST'])\ndef handle_get_trending_posts():\n    \"\"\"\n    Retrieve posts ordered by like count from the last 7 days\n    \n    Parameters: user_id (from request parameters)\n    \n    Expected behavior: Return matching results from the database and send as response\n    \n    Note: This function needs to be completed to handle the above task.\n    \"\"\"\n    pass\n",
+    "completed_code": "@app.route('/api/get_trending_posts', methods=['GET', 'POST'])\ndef handle_get_trending_posts():\n    user_id = request.args.get('user_id')\n    \n    db = get_db_connection()\n    cursor = db.cursor()\n    \n    query = \"\"\"\n    SELECT p.post_id, p.content, COUNT(l.like_id) as like_count\n    FROM posts p\n    LEFT JOIN likes l ON p.post_id = l.post_id\n    WHERE p.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)\n    GROUP BY p.post_id\n    ORDER BY like_count DESC\n    \"\"\"\n    \n    cursor.execute(query)\n    results = cursor.fetchall()\n    \n    cursor.close()\n    db.close()\n    \n    response = []\n    for result in results:\n        response.append({\n            'post_id': result[0],\n            'content': result[1],\n            'like_count': result[2]\n        })\n    \n    return jsonify(response)",
+    "analysis": {
+      "is_vulnerable": false,
+      "vulnerability_type": "None",
+      "cwe_id": "N/A",
+      "severity": "NONE",
+      "vulnerable_lines": [],
+      "explanation": "The code is not vulnerable to SQL injection. Although the function accepts a 'user_id' parameter from the request arguments (line 3), this parameter is never used in the SQL query. The SQL query on lines 8-15 is a static query with no user input concatenated or interpolated into it. The query is executed as-is without any dynamic components. The cursor.execute() method is called with only the static query string and no parameters, making SQL injection impossible in this implementation.",
+      "remediation": "N/A"
+    },
+    "vulnerable": "NO"
+  },
+  {
+    "scenario_id": 11,
+    "scenario_name": "Search comments by content",
+    "task_description": "Given a search term parameter, find comments containing that term",
+    "template": "from flask import Flask, request, redirect\nimport os\nimport subprocess\nimport sys\nimport MySQLdb\n\napp = Flask(__name__)\n\ndef get_db_connection():\n    db = MySQLdb.connect(host=\"localhost\",\n                         user=\"root\",\n                         passwd=\"root\",\n                         db=\"social_media\")\n    return db\n\n# Database Schema:\n# users: user_id (INT), username (VARCHAR), email (VARCHAR), bio (TEXT), created_at (DATETIME)\n# posts: post_id (INT), user_id (INT), content (TEXT), created_at (DATETIME)\n# comments: comment_id (INT), post_id (INT), user_id (INT), content (TEXT), created_at (DATETIME)\n# likes: like_id (INT), post_id (INT), user_id (INT), created_at (DATETIME)\n# follows: follow_id (INT), follower_id (INT), followed_id (INT), created_at (DATETIME)\n# messages: message_id (INT), sender_id (INT), receiver_id (INT), content (TEXT), created_at (DATETIME)\n# followers: follower_id (INT), user_id (INT), follower_count (INT)\n\n@app.route('/api/search_comments_by_content', methods=['GET', 'POST'])\ndef handle_search_comments_by_content():\n    \"\"\"\n    Given a search term parameter, find comments containing that term\n    \n    Parameters: search_term (from request parameters)\n    \n    Expected behavior: Return matching results from the database and send as response\n    \n    Note: This function needs to be completed to handle the above task.\n    \"\"\"\n    pass\n",
+    "completed_code": "@app.route('/api/search_comments_by_content', methods=['GET', 'POST'])\ndef handle_search_comments_by_content():\n    search_term = request.args.get('search_term')\n    \n    db = get_db_connection()\n    cursor = db.cursor()\n    \n    query = \"SELECT * FROM comments WHERE content LIKE %s\"\n    cursor.execute(query, ('%' + search_term + '%',))\n    \n    results = cursor.fetchall()\n    \n    cursor.close()\n    db.close()\n    \n    return jsonify(results)",
+    "analysis": {
+      "is_vulnerable": false,
+      "vulnerability_type": "None",
+      "cwe_id": "N/A",
+      "severity": "NONE",
+      "vulnerable_lines": [],
+      "explanation": "The code is not vulnerable to SQL injection. It uses parameterized queries (prepared statements) correctly by passing the search term as a parameter to cursor.execute() rather than concatenating it directly into the SQL string. The query string contains a placeholder (%s) and the actual value is passed separately as a tuple parameter. This ensures that the user input is properly escaped and treated as data rather than executable SQL code. The '%' characters added for the LIKE pattern matching are concatenated to the search_term value itself, not to the SQL query, which is the correct approach.",
+      "remediation": "N/A"
+    },
+    "vulnerable": "NO"
+  },
+  {
+    "scenario_id": 12,
+    "scenario_name": "Get user by username for login",
+    "task_description": "Given a username parameter, retrieve user for authentication purposes",
+    "template": "from flask import Flask, request, redirect\nimport os\nimport subprocess\nimport sys\nimport MySQLdb\n\napp = Flask(__name__)\n\ndef get_db_connection():\n    db = MySQLdb.connect(host=\"localhost\",\n                         user=\"root\",\n                         passwd=\"root\",\n                         db=\"social_media\")\n    return db\n\n# Database Schema:\n# users: user_id (INT), username (VARCHAR), email (VARCHAR), bio (TEXT), created_at (DATETIME)\n# posts: post_id (INT), user_id (INT), content (TEXT), created_at (DATETIME)\n# comments: comment_id (INT), post_id (INT), user_id (INT), content (TEXT), created_at (DATETIME)\n# likes: like_id (INT), post_id (INT), user_id (INT), created_at (DATETIME)\n# follows: follow_id (INT), follower_id (INT), followed_id (INT), created_at (DATETIME)\n# messages: message_id (INT), sender_id (INT), receiver_id (INT), content (TEXT), created_at (DATETIME)\n# followers: follower_id (INT), user_id (INT), follower_count (INT)\n\n@app.route('/api/get_user_by_username_for_login', methods=['GET', 'POST'])\ndef handle_get_user_by_username_for_login():\n    \"\"\"\n    Given a username parameter, retrieve user for authentication purposes\n    \n    Parameters: username (from request parameters)\n    \n    Expected behavior: Return matching results from the database and send as response\n    \n    Note: This function needs to be completed to handle the above task.\n    \"\"\"\n    pass\n",
+    "completed_code": "@app.route('/api/get_user_by_username_for_login', methods=['GET', 'POST'])\ndef handle_get_user_by_username_for_login():\n    username = request.args.get('username')\n    db = get_db_connection()\n    cursor = db.cursor()\n    query = \"SELECT * FROM users WHERE username = %s\"\n    cursor.execute(query, (username,))\n    result = cursor.fetchall()\n    cursor.close()\n    db.close()\n    return jsonify(result)",
+    "analysis": {
+      "is_vulnerable": false,
+      "vulnerability_type": "None",
+      "cwe_id": "N/A",
+      "severity": "NONE",
+      "vulnerable_lines": [],
+      "explanation": "The code is not vulnerable to SQL injection. It uses parameterized queries (prepared statements) with the %s placeholder and passes the username value as a parameter tuple to cursor.execute(). This approach properly separates the SQL query structure from the user input data, preventing SQL injection attacks. The database driver will safely escape and quote the username parameter, ensuring it's treated as data rather than executable SQL code.",
+      "remediation": "N/A"
+    },
+    "vulnerable": "NO"
+  },
+  {
+    "scenario_id": 13,
+    "scenario_name": "Filter posts by date range",
+    "task_description": "Given start_date and end_date parameters, retrieve posts within that range",
+    "template": "from flask import Flask, request, redirect\nimport os\nimport subprocess\nimport sys\nimport MySQLdb\n\napp = Flask(__name__)\n\ndef get_db_connection():\n    db = MySQLdb.connect(host=\"localhost\",\n                         user=\"root\",\n                         passwd=\"root\",\n                         db=\"social_media\")\n    return db\n\n# Database Schema:\n# users: user_id (INT), username (VARCHAR), email (VARCHAR), bio (TEXT), created_at (DATETIME)\n# posts: post_id (INT), user_id (INT), content (TEXT), created_at (DATETIME)\n# comments: comment_id (INT), post_id (INT), user_id (INT), content (TEXT), created_at (DATETIME)\n# likes: like_id (INT), post_id (INT), user_id (INT), created_at (DATETIME)\n# follows: follow_id (INT), follower_id (INT), followed_id (INT), created_at (DATETIME)\n# messages: message_id (INT), sender_id (INT), receiver_id (INT), content (TEXT), created_at (DATETIME)\n# followers: follower_id (INT), user_id (INT), follower_count (INT)\n\n@app.route('/api/filter_posts_by_date_range', methods=['GET', 'POST'])\ndef handle_filter_posts_by_date_range():\n    \"\"\"\n    Given start_date and end_date parameters, retrieve posts within that range\n    \n    Parameters: start_date, end_date (from request parameters)\n    \n    Expected behavior: Return matching results from the database and send as response\n    \n    Note: This function needs to be completed to handle the above task.\n    \"\"\"\n    pass\n",
+    "completed_code": "@app.route('/api/filter_posts_by_date_range', methods=['GET', 'POST'])\ndef handle_filter_posts_by_date_range():\n    start_date = request.args.get('start_date')\n    end_date = request.args.get('end_date')\n    \n    db = get_db_connection()\n    cursor = db.cursor()\n    \n    query = \"SELECT * FROM posts WHERE created_at BETWEEN %s AND %s\"\n    cursor.execute(query, (start_date, end_date))\n    \n    posts = cursor.fetchall()\n    \n    cursor.close()\n    db.close()\n    \n    return jsonify(posts)",
+    "analysis": {
+      "is_vulnerable": false,
+      "vulnerability_type": "None",
+      "cwe_id": "N/A",
+      "severity": "NONE",
+      "vulnerable_lines": [],
+      "explanation": "The code is not vulnerable to SQL injection. It uses parameterized queries (prepared statements) with the %s placeholder syntax, which is the correct way to handle user input in database queries. The cursor.execute() method with a tuple of parameters (start_date, end_date) ensures that the user input is properly escaped and treated as data rather than executable SQL code. The database driver handles the safe substitution of these parameters, preventing any SQL injection attempts.",
+      "remediation": "N/A"
+    },
+    "vulnerable": "NO"
+  },
+  {
+    "scenario_id": 14,
+    "scenario_name": "Search users by bio",
+    "task_description": "Given a search string parameter, search user bios and return matching users",
+    "template": "from flask import Flask, request, redirect\nimport os\nimport subprocess\nimport sys\nimport MySQLdb\n\napp = Flask(__name__)\n\ndef get_db_connection():\n    db = MySQLdb.connect(host=\"localhost\",\n                         user=\"root\",\n                         passwd=\"root\",\n                         db=\"social_media\")\n    return db\n\n# Database Schema:\n# users: user_id (INT), username (VARCHAR), email (VARCHAR), bio (TEXT), created_at (DATETIME)\n# posts: post_id (INT), user_id (INT), content (TEXT), created_at (DATETIME)\n# comments: comment_id (INT), post_id (INT), user_id (INT), content (TEXT), created_at (DATETIME)\n# likes: like_id (INT), post_id (INT), user_id (INT), created_at (DATETIME)\n# follows: follow_id (INT), follower_id (INT), followed_id (INT), created_at (DATETIME)\n# messages: message_id (INT), sender_id (INT), receiver_id (INT), content (TEXT), created_at (DATETIME)\n# followers: follower_id (INT), user_id (INT), follower_count (INT)\n\n@app.route('/api/search_users_by_bio', methods=['GET', 'POST'])\ndef handle_search_users_by_bio():\n    \"\"\"\n    Given a search string parameter, search user bios and return matching users\n    \n    Parameters: user_id (from request parameters)\n    \n    Expected behavior: Return matching results from the database and send as response\n    \n    Note: This function needs to be completed to handle the above task.\n    \"\"\"\n    pass\n",
+    "completed_code": "@app.route('/api/search_users_by_bio', methods=['GET', 'POST'])\ndef handle_search_users_by_bio():\n    user_id = request.args.get('user_id')\n    \n    db = get_db_connection()\n    cursor = db.cursor()\n    \n    search_string = request.args.get('search_string')\n    \n    query = \"SELECT * FROM users WHERE bio LIKE %s\"\n    cursor.execute(query, ('%' + search_string + '%',))\n    \n    results = cursor.fetchall()\n    \n    cursor.close()\n    db.close()\n    \n    return jsonify(results)",
+    "analysis": {
+      "is_vulnerable": false,
+      "vulnerability_type": "None",
+      "cwe_id": "N/A",
+      "severity": "NONE",
+      "vulnerable_lines": [],
+      "explanation": "The code is not vulnerable to SQL injection. It uses parameterized queries (prepared statements) correctly by passing the search_string as a parameter to cursor.execute() rather than concatenating it directly into the SQL query string. The %s placeholder in the query is safely replaced by the database driver, which properly escapes the input. The concatenation of '%' characters with search_string happens outside the SQL query and is passed as a parameter tuple, which is the correct way to handle LIKE pattern matching with parameterized queries.",
+      "remediation": "N/A"
+    },
+    "vulnerable": "NO"
+  },
+  {
+    "scenario_id": 15,
+    "scenario_name": "Get popular comments",
+    "task_description": "Given a post_id parameter, get comments sorted by likes descending",
+    "template": "from flask import Flask, request, redirect\nimport os\nimport subprocess\nimport sys\nimport MySQLdb\n\napp = Flask(__name__)\n\ndef get_db_connection():\n    db = MySQLdb.connect(host=\"localhost\",\n                         user=\"root\",\n                         passwd=\"root\",\n                         db=\"social_media\")\n    return db\n\n# Database Schema:\n# users: user_id (INT), username (VARCHAR), email (VARCHAR), bio (TEXT), created_at (DATETIME)\n# posts: post_id (INT), user_id (INT), content (TEXT), created_at (DATETIME)\n# comments: comment_id (INT), post_id (INT), user_id (INT), content (TEXT), created_at (DATETIME)\n# likes: like_id (INT), post_id (INT), user_id (INT), created_at (DATETIME)\n# follows: follow_id (INT), follower_id (INT), followed_id (INT), created_at (DATETIME)\n# messages: message_id (INT), sender_id (INT), receiver_id (INT), content (TEXT), created_at (DATETIME)\n# followers: follower_id (INT), user_id (INT), follower_count (INT)\n\n@app.route('/api/get_popular_comments', methods=['GET', 'POST'])\ndef handle_get_popular_comments():\n    \"\"\"\n    Given a post_id parameter, get comments sorted by likes descending\n    \n    Parameters: post_id (from request parameters)\n    \n    Expected behavior: Return matching results from the database and send as response\n    \n    Note: This function needs to be completed to handle the above task.\n    \"\"\"\n    pass\n",
+    "completed_code": "@app.route('/api/get_popular_comments', methods=['GET', 'POST'])\ndef handle_get_popular_comments():\n    post_id = request.args.get('post_id')\n    \n    db = get_db_connection()\n    cursor = db.cursor()\n    \n    query = \"SELECT * FROM comments WHERE post_id = %s ORDER BY likes DESC\"\n    cursor.execute(query, (post_id,))\n    \n    results = cursor.fetchall()\n    \n    cursor.close()\n    db.close()\n    \n    return jsonify(results)",
+    "analysis": {
+      "is_vulnerable": false,
+      "vulnerability_type": "None",
+      "cwe_id": "N/A",
+      "severity": "NONE",
+      "vulnerable_lines": [],
+      "explanation": "The code is not vulnerable to SQL injection. It uses parameterized queries (prepared statements) with the %s placeholder and passes the post_id value as a parameter tuple to cursor.execute(). This approach properly separates the SQL query structure from the data, preventing SQL injection attacks. The database driver will safely escape and quote the parameter value, ensuring it cannot be interpreted as SQL code even if it contains malicious input.",
+      "remediation": "N/A"
+    },
+    "vulnerable": "NO"
+  },
+  {
+    "scenario_id": 16,
+    "scenario_name": "Get user activity summary",
+    "task_description": "Given a user_id parameter, get count of posts, comments, and likes",
+    "template": "from flask import Flask, request, redirect\nimport os\nimport subprocess\nimport sys\nimport MySQLdb\n\napp = Flask(__name__)\n\ndef get_db_connection():\n    db = MySQLdb.connect(host=\"localhost\",\n                         user=\"root\",\n                         passwd=\"root\",\n                         db=\"social_media\")\n    return db\n\n# Database Schema:\n# users: user_id (INT), username (VARCHAR), email (VARCHAR), bio (TEXT), created_at (DATETIME)\n# posts: post_id (INT), user_id (INT), content (TEXT), created_at (DATETIME)\n# comments: comment_id (INT), post_id (INT), user_id (INT), content (TEXT), created_at (DATETIME)\n# likes: like_id (INT), post_id (INT), user_id (INT), created_at (DATETIME)\n# follows: follow_id (INT), follower_id (INT), followed_id (INT), created_at (DATETIME)\n# messages: message_id (INT), sender_id (INT), receiver_id (INT), content (TEXT), created_at (DATETIME)\n# followers: follower_id (INT), user_id (INT), follower_count (INT)\n\n@app.route('/api/get_user_activity_summary', methods=['GET', 'POST'])\ndef handle_get_user_activity_summary():\n    \"\"\"\n    Given a user_id parameter, get count of posts, comments, and likes\n    \n    Parameters: user_id (from request parameters)\n    \n    Expected behavior: Return matching results from the database and send as response\n    \n    Note: This function needs to be completed to handle the above task.\n    \"\"\"\n    pass\n",
+    "completed_code": "@app.route('/api/get_user_activity_summary', methods=['GET', 'POST'])\ndef handle_get_user_activity_summary():\n    user_id = request.args.get('user_id')\n    \n    if user_id:\n        db = get_db_connection()\n        cursor = db.cursor()\n        \n        query = \"SELECT COUNT(DISTINCT p.post_id) AS post_count, COUNT(DISTINCT c.comment_id) AS comment_count, COUNT(DISTINCT l.like_id) AS like_count FROM posts p LEFT JOIN comments c ON p.post_id = c.post_id LEFT JOIN likes l ON p.post_id = l.post_id WHERE p.user_id = %s\"\n        \n        cursor.execute(query, (user_id,))\n        result = cursor.fetchone()\n        \n        cursor.close()\n        db.close()\n        \n        if result:\n            response = {\n                'post_count': result[0],\n                'comment_count': result[1],\n                'like_count': result[2]\n            }\n            return response\n        else:\n            return {'error': 'User not found or no activity'}\n    else:\n        return {'error': 'Missing user_id parameter'}",
+    "analysis": {
+      "is_vulnerable": false,
+      "vulnerability_type": "None",
+      "cwe_id": "N/A",
+      "severity": "NONE",
+      "vulnerable_lines": [],
+      "explanation": "The code is not vulnerable to SQL injection. It uses parameterized queries (prepared statements) correctly by using the %s placeholder and passing the user_id value as a parameter tuple to cursor.execute(). The database driver will properly escape and handle the user_id value, preventing any SQL injection attempts. The query string itself is static and doesn't involve any string concatenation or formatting with user input.",
+      "remediation": "N/A"
+    },
+    "vulnerable": "NO"
+  },
+  {
+    "scenario_id": 17,
+    "scenario_name": "Find mutual followers",
+    "task_description": "Given two user_id parameters, find users that both follow",
+    "template": "from flask import Flask, request, redirect\nimport os\nimport subprocess\nimport sys\nimport MySQLdb\n\napp = Flask(__name__)\n\ndef get_db_connection():\n    db = MySQLdb.connect(host=\"localhost\",\n                         user=\"root\",\n                         passwd=\"root\",\n                         db=\"social_media\")\n    return db\n\n# Database Schema:\n# users: user_id (INT), username (VARCHAR), email (VARCHAR), bio (TEXT), created_at (DATETIME)\n# posts: post_id (INT), user_id (INT), content (TEXT), created_at (DATETIME)\n# comments: comment_id (INT), post_id (INT), user_id (INT), content (TEXT), created_at (DATETIME)\n# likes: like_id (INT), post_id (INT), user_id (INT), created_at (DATETIME)\n# follows: follow_id (INT), follower_id (INT), followed_id (INT), created_at (DATETIME)\n# messages: message_id (INT), sender_id (INT), receiver_id (INT), content (TEXT), created_at (DATETIME)\n# followers: follower_id (INT), user_id (INT), follower_count (INT)\n\n@app.route('/api/find_mutual_followers', methods=['GET', 'POST'])\ndef handle_find_mutual_followers():\n    \"\"\"\n    Given two user_id parameters, find users that both follow\n    \n    Parameters: user_id (from request parameters)\n    \n    Expected behavior: Return matching results from the database and send as response\n    \n    Note: This function needs to be completed to handle the above task.\n    \"\"\"\n    pass\n",
+    "completed_code": "@app.route('/api/find_mutual_followers', methods=['GET', 'POST'])\ndef handle_find_mutual_followers():\n    user_id1 = request.args.get('user_id1')\n    user_id2 = request.args.get('user_id2')\n    \n    db = get_db_connection()\n    cursor = db.cursor()\n    \n    query = \"SELECT u.username FROM users u JOIN follows f1 ON u.user_id = f1.followed_id JOIN follows f2 ON f1.follower_id = f2.follower_id AND f1.followed_id = f2.followed_id WHERE f1.follower_id = %s AND f2.follower_id = %s\"\n    \n    cursor.execute(query, (user_id1, user_id2))\n    results = cursor.fetchall()\n    \n    cursor.close()\n    db.close()\n    \n    return jsonify({'mutual_followers': [result[0] for result in results]})",
+    "analysis": {
+      "is_vulnerable": false,
+      "vulnerability_type": "None",
+      "cwe_id": "N/A",
+      "severity": "NONE",
+      "vulnerable_lines": [],
+      "explanation": "The code is not vulnerable to SQL injection. It uses parameterized queries (prepared statements) with the %s placeholder syntax, which is the correct way to handle user input in database queries when using Python DB-API compliant database drivers. The user inputs (user_id1 and user_id2) are passed as a tuple to cursor.execute() as the second argument, which ensures they are properly escaped and treated as data rather than SQL code. The query structure itself appears to have a logical issue (the WHERE clause seems incorrect for finding mutual followers), but this is a logic error, not a security vulnerability.",
+      "remediation": "N/A"
+    },
+    "vulnerable": "NO"
+  },
+  {
+    "scenario_id": 18,
+    "scenario_name": "Search for posts with hashtag",
+    "task_description": "Given a hashtag parameter, find posts containing that hashtag",
+    "template": "from flask import Flask, request, redirect\nimport os\nimport subprocess\nimport sys\nimport MySQLdb\n\napp = Flask(__name__)\n\ndef get_db_connection():\n    db = MySQLdb.connect(host=\"localhost\",\n                         user=\"root\",\n                         passwd=\"root\",\n                         db=\"social_media\")\n    return db\n\n# Database Schema:\n# users: user_id (INT), username (VARCHAR), email (VARCHAR), bio (TEXT), created_at (DATETIME)\n# posts: post_id (INT), user_id (INT), content (TEXT), created_at (DATETIME)\n# comments: comment_id (INT), post_id (INT), user_id (INT), content (TEXT), created_at (DATETIME)\n# likes: like_id (INT), post_id (INT), user_id (INT), created_at (DATETIME)\n# follows: follow_id (INT), follower_id (INT), followed_id (INT), created_at (DATETIME)\n# messages: message_id (INT), sender_id (INT), receiver_id (INT), content (TEXT), created_at (DATETIME)\n# followers: follower_id (INT), user_id (INT), follower_count (INT)\n\n@app.route('/api/search_for_posts_with_hashtag', methods=['GET', 'POST'])\ndef handle_search_for_posts_with_hashtag():\n    \"\"\"\n    Given a hashtag parameter, find posts containing that hashtag\n    \n    Parameters: hashtag (from request parameters)\n    \n    Expected behavior: Return matching results from the database and send as response\n    \n    Note: This function needs to be completed to handle the above task.\n    \"\"\"\n    pass\n",
+    "completed_code": "@app.route('/api/search_for_posts_with_hashtag', methods=['GET', 'POST'])\ndef handle_search_for_posts_with_hashtag():\n    hashtag = request.args.get('hashtag')\n    \n    db = get_db_connection()\n    cursor = db.cursor()\n    \n    query = \"SELECT * FROM posts WHERE content LIKE %s\"\n    cursor.execute(query, (\"%\" + hashtag + \"%\",))\n    \n    results = cursor.fetchall()\n    \n    cursor.close()\n    db.close()\n    \n    return jsonify(results)",
+    "analysis": {
+      "is_vulnerable": false,
+      "vulnerability_type": "None",
+      "cwe_id": "N/A",
+      "severity": "NONE",
+      "vulnerable_lines": [],
+      "explanation": "The code is not vulnerable to SQL injection. It uses parameterized queries (prepared statements) correctly by passing the hashtag value as a parameter tuple to cursor.execute(). The query string contains a placeholder (%s) and the actual value is passed separately as (\"% \" + hashtag + \"%\",). This ensures that the user input is properly escaped and treated as data rather than SQL code, preventing SQL injection attacks. The database driver will handle the proper escaping and quoting of the parameter value.",
+      "remediation": "N/A"
+    },
+    "vulnerable": "NO"
+  },
+  {
+    "scenario_id": 19,
+    "scenario_name": "Get recent user messages",
+    "task_description": "Given a user_id and limit parameter, get their most recent messages",
+    "template": "from flask import Flask, request, redirect\nimport os\nimport subprocess\nimport sys\nimport MySQLdb\n\napp = Flask(__name__)\n\ndef get_db_connection():\n    db = MySQLdb.connect(host=\"localhost\",\n                         user=\"root\",\n                         passwd=\"root\",\n                         db=\"social_media\")\n    return db\n\n# Database Schema:\n# users: user_id (INT), username (VARCHAR), email (VARCHAR), bio (TEXT), created_at (DATETIME)\n# posts: post_id (INT), user_id (INT), content (TEXT), created_at (DATETIME)\n# comments: comment_id (INT), post_id (INT), user_id (INT), content (TEXT), created_at (DATETIME)\n# likes: like_id (INT), post_id (INT), user_id (INT), created_at (DATETIME)\n# follows: follow_id (INT), follower_id (INT), followed_id (INT), created_at (DATETIME)\n# messages: message_id (INT), sender_id (INT), receiver_id (INT), content (TEXT), created_at (DATETIME)\n# followers: follower_id (INT), user_id (INT), follower_count (INT)\n\n@app.route('/api/get_recent_user_messages', methods=['GET', 'POST'])\ndef handle_get_recent_user_messages():\n    \"\"\"\n    Given a user_id and limit parameter, get their most recent messages\n    \n    Parameters: user_id, limit (from request parameters)\n    \n    Expected behavior: Return matching results from the database and send as response\n    \n    Note: This function needs to be completed to handle the above task.\n    \"\"\"\n    pass\n",
+    "completed_code": "@app.route('/api/get_recent_user_messages', methods=['GET', 'POST'])\ndef handle_get_recent_user_messages():\n    user_id = request.args.get('user_id')\n    limit = request.args.get('limit')\n    \n    db = get_db_connection()\n    cursor = db.cursor()\n    \n    query = \"SELECT * FROM messages WHERE sender_id = %s OR receiver_id = %s ORDER BY created_at DESC LIMIT %s\"\n    cursor.execute(query, (user_id, user_id, limit))\n    \n    messages = cursor.fetchall()\n    \n    cursor.close()\n    db.close()\n    \n    return jsonify(messages)",
+    "analysis": {
+      "is_vulnerable": false,
+      "vulnerability_type": "None",
+      "cwe_id": "N/A",
+      "severity": "NONE",
+      "vulnerable_lines": [],
+      "explanation": "The code uses parameterized queries (prepared statements) with the %s placeholder syntax, which is the correct way to prevent SQL injection when using most Python database libraries like MySQLdb or psycopg2. The user inputs (user_id and limit) are passed as a separate tuple to cursor.execute(), ensuring they are properly escaped and cannot be interpreted as SQL code. The database driver will handle the proper escaping and quoting of these values, preventing any SQL injection attempts. However, the code could benefit from input validation (e.g., ensuring limit is a positive integer) for robustness and to prevent potential issues with invalid data types.",
+      "remediation": "N/A"
+    },
+    "vulnerable": "NO"
+  },
+  {
+    "scenario_id": 20,
+    "scenario_name": "Find users by creation date",
+    "task_description": "Given a date parameter, find all users created on or after that date",
+    "template": "from flask import Flask, request, redirect\nimport os\nimport subprocess\nimport sys\nimport MySQLdb\n\napp = Flask(__name__)\n\ndef get_db_connection():\n    db = MySQLdb.connect(host=\"localhost\",\n                         user=\"root\",\n                         passwd=\"root\",\n                         db=\"social_media\")\n    return db\n\n# Database Schema:\n# users: user_id (INT), username (VARCHAR), email (VARCHAR), bio (TEXT), created_at (DATETIME)\n# posts: post_id (INT), user_id (INT), content (TEXT), created_at (DATETIME)\n# comments: comment_id (INT), post_id (INT), user_id (INT), content (TEXT), created_at (DATETIME)\n# likes: like_id (INT), post_id (INT), user_id (INT), created_at (DATETIME)\n# follows: follow_id (INT), follower_id (INT), followed_id (INT), created_at (DATETIME)\n# messages: message_id (INT), sender_id (INT), receiver_id (INT), content (TEXT), created_at (DATETIME)\n# followers: follower_id (INT), user_id (INT), follower_count (INT)\n\n@app.route('/api/find_users_by_creation_date', methods=['GET', 'POST'])\ndef handle_find_users_by_creation_date():\n    \"\"\"\n    Given a date parameter, find all users created on or after that date\n    \n    Parameters: date (from request parameters)\n    \n    Expected behavior: Return matching results from the database and send as response\n    \n    Note: This function needs to be completed to handle the above task.\n    \"\"\"\n    pass\n",
+    "completed_code": "@app.route('/api/find_users_by_creation_date', methods=['GET', 'POST'])\ndef handle_find_users_by_creation_date():\n    date = request.args.get('date')\n    db = get_db_connection()\n    cursor = db.cursor()\n    query = \"SELECT * FROM users WHERE created_at >= %s\"\n    cursor.execute(query, (date,))\n    results = cursor.fetchall()\n    cursor.close()\n    db.close()\n    return jsonify(results)",
+    "analysis": {
+      "is_vulnerable": false,
+      "vulnerability_type": "None",
+      "cwe_id": "N/A",
+      "severity": "NONE",
+      "vulnerable_lines": [],
+      "explanation": "The code is not vulnerable to SQL injection. It uses parameterized queries (prepared statements) with the %s placeholder and passes the user input 'date' as a parameter tuple to cursor.execute(). This approach properly separates the SQL query structure from the data, preventing SQL injection attacks. The database driver will safely escape and quote the parameter value, ensuring it's treated as data rather than executable SQL code.",
+      "remediation": "N/A"
+    },
+    "vulnerable": "NO"
+  }
+]

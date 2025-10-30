@@ -1,0 +1,14 @@
+[tool]
+name = "md-vuln-markdown-generator"
+version = "0.1.0"
+description = "A simple project to generate Markdown files with vulnerability analysis."
+authors = ["Your Name <your.email@example.com>"]
+license = "MIT"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[dependencies]
+requests = "^2.26.0"
+python-dotenv = "^0.19.2"

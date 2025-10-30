@@ -1,0 +1,161 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║                                                                            ║
+║           🔬 SQL INJECTION VULNERABILITY EXPERIMENT - START HERE 🔬       ║
+║                                                                            ║
+║                         OpenAI GPT-3.5 Code Generation                     ║
+║                        Vulnerability Analysis with Claude                  ║
+║                                                                            ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+📌 QUICK START (5 MINUTES)
+
+  1. Get API Keys
+     • Claude: https://console.anthropic.com/account/keys
+     • OpenAI: https://platform.openai.com/account/api-keys
+
+  2. Create Configuration
+     $ cp .env.example .env
+     $ nano .env  # Add your API keys
+
+  3. Verify Setup
+     $ python setup_check.py
+
+  4. Run Experiment
+     $ python -m src.experiment_main
+
+  5. View Results
+     $ open experiments/REPORT.md
+     $ open experiments/*.png
+
+
+📚 DOCUMENTATION GUIDE
+
+  For Quick Reference:     Read → QUICK_REFERENCE.md (60-second guide)
+  For Setup Help:          Read → SETUP_GUIDE.md (complete instructions)
+  For Project Overview:    Read → PROJECT_README.md (goals & features)
+  For Architecture:        Read → OVERVIEW.md (diagrams & concepts)
+  For What's Implemented:  Read → IMPLEMENTATION_SUMMARY.md
+
+
+🚀 RECOMMENDED WORKFLOW
+
+  First Time?              
+  1. python setup_check.py
+  2. Read: QUICK_REFERENCE.md
+  3. python -m src.experiment_main 5  (test with 5 samples)
+  
+  Ready for Full Run?      
+  1. python -m src.experiment_main 20 (default, ~3 minutes)
+  2. Check: experiments/REPORT.md
+  3. View: experiments/*.png
+  
+  Want Details?            
+  1. Read: SETUP_GUIDE.md
+  2. Run: make help
+  3. Try: make run-small
+
+
+🎯 WHAT THIS DOES
+
+  ✓ Generates 20 natural language prompts for SQL code (Claude)
+  ✓ Generates SQL code for each prompt (GPT-3.5)
+  ✓ Analyzes each SQL for injection vulnerabilities (Claude)
+  ✓ Creates professional visualizations and reports
+  ✓ Exports raw data for further analysis
+
+
+📊 OUTPUT FILES YOU'LL GET
+
+  experiments/
+  ├── experiment_results.json       Raw data (import to Excel/Python)
+  ├── REPORT.md                     Professional markdown report
+  ├── 01_vulnerability_distribution.png  Pie chart
+  ├── 02_cwe_distribution.png            Bar chart
+  ├── 03_summary_statistics.png          Stats display
+  └── 04_sample_showcase.png             SQL code examples
+
+
+💡 KEY FINDINGS YOU'LL DISCOVER
+
+  • What % of GPT-generated SQL contains injection flaws
+  • Which CWE vulnerabilities are most common
+  • Examples of vulnerable vs safe SQL patterns
+  • Statistical analysis of vulnerability types
+
+
+⚡ MAKE COMMANDS (Optional)
+
+  make help              Show all available commands
+  make setup             Complete setup
+  make run-small         Test with 5 samples
+  make run              Full experiment (20 samples)
+  make run-large        Large experiment (100 samples)
+  make analyze          Analyze results
+  make clean            Clean temporary files
+
+
+🔧 TROUBLESHOOTING
+
+  Problem: "API key not found"
+  Solution: Check .env file exists, keys are set correctly
+  
+  Problem: "ModuleNotFoundError"
+  Solution: pip install -r requirements.txt
+  
+  Problem: "Connection timeout"
+  Solution: Check internet, try again later
+  
+  More help: See SETUP_GUIDE.md
+
+
+💰 COST ESTIMATE
+
+  Per 20 samples: ~$0.05
+  Per 50 samples: ~$0.12
+  Per 100 samples: ~$0.25
+
+
+🔑 IMPORTANT NOTES
+
+  • Keep .env file secret (contains API keys)
+  • It's in .gitignore (won't be committed)
+  • First run takes 2-3 minutes (API calls take time)
+  • Results are saved in experiments/ folder
+
+
+✅ YOU'RE ALL SET!
+
+  Next step: Run this command
+  
+  $ python setup_check.py
+  
+  It will verify your setup and tell you if anything's missing.
+  Then run:
+  
+  $ python -m src.experiment_main
+
+
+📞 NEED HELP?
+
+  1. Check QUICK_REFERENCE.md for common solutions
+  2. Read SETUP_GUIDE.md for detailed instructions
+  3. Run python setup_check.py to diagnose issues
+  4. Check generated REPORT.md for insights
+
+
+🎉 LET'S GO!
+
+  Everything is ready. Start with:
+  
+  $ python setup_check.py
+  $ python -m src.experiment_main
+  
+  Then check the experiments/ folder for your results!
+
+
+═══════════════════════════════════════════════════════════════════════════════
+
+Questions? Read the documentation files above.
+Ready to start? Run: python setup_check.py
+
+═══════════════════════════════════════════════════════════════════════════════
