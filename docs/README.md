@@ -34,7 +34,7 @@ md-vuln-markdown-generator
 1. Clone the repository:
    ```
    git clone <repository-url>
-   cd md-vuln-markdown-generator
+   cd sql-vuln-generator
    ```
 
 2. Create a virtual environment:
