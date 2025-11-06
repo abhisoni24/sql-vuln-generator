@@ -81,7 +81,12 @@ def main(num_samples: int = 20):
     print("STEP 2: CODE COMPLETION AND VULNERABILITY ANALYSIS")
     print("=" * 70)
 
-    runner = CodeCompletionRunner(openai_client, claude_client)
+    # Create runner with SQL reference for robust analysis
+    runner = CodeCompletionRunner(
+        openai_client, 
+        claude_client,
+        sql_reference_path="checks/sql/sql_owasp_reference.md"
+    )
     summary = runner.run_experiment(templates, str(output_dir))
 
     # Step 3: Export detailed report
