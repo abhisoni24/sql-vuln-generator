@@ -2,8 +2,10 @@ import os
 from openai import OpenAI
 from typing import Optional
 
+from .base_llm_client import BaseLLMClient
 
-class OpenAIClient:
+
+class OpenAIClient(BaseLLMClient):
     """Wrapper around OpenAI ChatCompletion API (gpt-3.5-turbo).
 
     Exposes `get_sql_code` to return assistant output for a prompt.
@@ -32,6 +34,14 @@ class OpenAIClient:
             return content.strip() if content else ""
         
         return ""
+
+    def get_model_name(self) -> str:
+        """Get the OpenAI model name."""
+        return self.model
+    
+    def get_provider_name(self) -> str:
+        """Get the provider name."""
+        return "OpenAI"
 
     # keep legacy names if other code expects them
     generate_sql = get_sql_code

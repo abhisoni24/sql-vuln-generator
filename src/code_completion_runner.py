@@ -1,5 +1,5 @@
 """
-Module to handle code completion using GPT-3.5 and vulnerability analysis with Claude.
+Module to handle code completion using various LLM providers and vulnerability analysis with Claude.
 """
 
 import json
@@ -8,16 +8,18 @@ import time
 from pathlib import Path
 from typing import List, Dict, Optional, Tuple
 
+from api.base_llm_client import BaseLLMClient
+
 
 class CodeCompletionRunner:
     """
-    Orchestrates the process of completing code templates with GPT-3.5
-    and analyzing for SQL injection vulnerabilities with Claude.
+    Orchestrates the process of completing code templates with various LLMs
+    (OpenAI GPT, Ollama Qwen, etc.) and analyzing for SQL injection vulnerabilities with Claude.
     """
 
     def __init__(
         self, 
-        openai_client, 
+        code_generator_client: BaseLLMClient,
         claude_client,
         sql_reference_path: str = "checks/sql/sql_owasp_reference.md"
     ):
@@ -25,13 +27,17 @@ class CodeCompletionRunner:
         Initialize the runner.
         
         Args:
-            openai_client: Instance of OpenAIClient
-            claude_client: Instance of ClaudeClient
+            code_generator_client: Instance of any BaseLLMClient implementation (OpenAI, Ollama, etc.)
+            claude_client: Instance of ClaudeClient for vulnerability analysis
             sql_reference_path: Path to SQL vulnerability reference markdown file
         """
-        self.openai_client = openai_client
+        self.code_generator = code_generator_client
         self.claude_client = claude_client
         self.results = []
+        
+        # Store provider info for reporting
+        self.code_gen_provider = code_generator_client.get_provider_name()
+        self.code_gen_model = code_generator_client.get_model_name()
         
         # Load SQL vulnerability reference
         self.sql_reference = self._load_sql_reference(sql_reference_path)
@@ -71,7 +77,7 @@ class CodeCompletionRunner:
         self, template: str, scenario_name: str, max_retries: int = 3
     ) -> Tuple[str, bool]:
         """
-        Use GPT-3.5 to complete the Flask function code.
+        Use the configured LLM to complete the Flask function code.
         
         Args:
             template: Incomplete code template
@@ -99,7 +105,7 @@ Requirements:
 
         for attempt in range(max_retries):
             try:
-                completed_code = self.openai_client.get_sql_code(prompt, max_tokens=500)
+                completed_code = self.code_generator.get_sql_code(prompt, max_tokens=500)
 
                 if completed_code and len(completed_code) > 50:
                     return completed_code, True
@@ -211,7 +217,7 @@ Respond ONLY with valid JSON, no additional text."""
         self, templates: List[Dict], output_dir: str = "experiments"
     ) -> Dict:
         """
-        Run the complete experiment: complete code with GPT, analyze with Claude.
+        Run the complete experiment: complete code with LLM, analyze with Claude.
         
         Args:
             templates: List of code templates to complete
@@ -225,6 +231,8 @@ Respond ONLY with valid JSON, no additional text."""
 
         print("\n" + "=" * 60)
         print("CODE COMPLETION AND VULNERABILITY ANALYSIS EXPERIMENT")
+        print(f"Code Generator: {self.code_gen_provider} ({self.code_gen_model})")
+        print(f"Vulnerability Analyzer: Claude (with cached SQL reference)")
         print("=" * 60 + "\n")
 
         total_templates = len(templates)
@@ -235,8 +243,8 @@ Respond ONLY with valid JSON, no additional text."""
 
             print(f"[{idx}/{total_templates}] Processing: {scenario_name}")
 
-            # Step 1: Complete the code with GPT-3.5
-            print(f"  → Completing code with GPT-3.5...", end="", flush=True)
+            # Step 1: Complete the code with the configured LLM
+            print(f"  → Completing code with {self.code_gen_provider}...", end="", flush=True)
             completed_code, success = self.complete_code_with_gpt(template, scenario_name)
 
             if not success:
@@ -357,6 +365,12 @@ Respond ONLY with valid JSON, no additional text."""
 
         with open(markdown_path, "w") as f:
             f.write("# Code Completion and SQL Injection Vulnerability Analysis Report\n\n")
+            
+            # Add metadata about the experiment
+            f.write("## Experiment Configuration\n\n")
+            f.write(f"- **Code Generator:** {self.code_gen_provider} ({self.code_gen_model})\n")
+            f.write(f"- **Vulnerability Analyzer:** Claude (with OWASP SQL reference)\n")
+            f.write(f"- **Analysis Approach:** Cached system prompts for efficiency\n\n")
 
             # Summary
             summary = self._generate_summary()
@@ -394,7 +408,7 @@ Respond ONLY with valid JSON, no additional text."""
                 f.write("```\n\n")
 
                 if result["completed_code"]:
-                    f.write("**Generated Code (by GPT-3.5):**\n```python\n")
+                    f.write(f"**Generated Code (by {self.code_gen_provider} - {self.code_gen_model}):**\n```python\n")
                     f.write(
                         result["completed_code"][:600]
                         + "...\n"
