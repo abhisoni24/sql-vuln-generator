@@ -25,6 +25,7 @@ from dotenv import load_dotenv
 from api.claude_client import ClaudeClient
 from api.openai_client import OpenAIClient
 from api.ollama_client import OllamaClient, OllamaModels
+from api.gemini_client import GeminiClient
 from prompt_generator import PromptGenerator
 from code_completion_runner import CodeCompletionRunner
 
@@ -45,6 +46,9 @@ Examples:
   # Run with Ollama Llama 3.1
   python code_completion_main.py 30 --provider ollama --model llama3.1:8b
   
+  # Run with Google Gemini
+  python code_completion_main.py 30 --provider gemini --model gemini-3-pro
+  
   # Run with custom experiment name
   python code_completion_main.py 50 --provider ollama --model qwen2.5-coder:7b --name qwen-coder-test
 
@@ -56,6 +60,12 @@ Available Ollama Models:
   - deepseek-coder:6.7b
   - llama3.1:8b
   - mistral:7b
+
+Available Gemini Models:
+  - gemini-3-pro (recommended)
+  - gemini-3-pro-preview
+  - gemini-1.5-pro
+  - gemini-1.5-flash
 """
     )
     
@@ -70,7 +80,7 @@ Available Ollama Models:
     parser.add_argument(
         "--provider",
         type=str,
-        choices=["openai", "ollama"],
+        choices=["openai", "ollama", "gemini"],
         default="openai",
         help="LLM provider to use for code generation (default: openai)"
     )
@@ -140,9 +150,11 @@ def initialize_code_generator(args):
             print(f"   And the model '{model}' is available (run 'ollama pull {model}')")
             sys.exit(1)
     
-    else:
-        print(f"❌ Error: Unsupported provider: {args.provider}")
-        sys.exit(1)
+    elif args.provider == "gemini":
+        # Google Gemini
+        model = args.model or "gemini-3-pro"
+        print(f"✓ Initializing Gemini client (model: {model})")
+        return GeminiClient(model=model)
 
 
 def main():
