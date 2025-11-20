@@ -45,11 +45,25 @@ class BaseLLMClient(ABC):
         pass
     
     @abstractmethod
-    def get_provider_name(self) -> str:
+    def send_prompt_with_system(
+        self, 
+        system_prompt: str, 
+        user_prompt: str, 
+        max_tokens: int = 1024, 
+        temperature: float = 0.0,
+        cache_system: bool = False
+    ) -> str:
         """
-        Get the name of the LLM provider.
+        Send a prompt with system context for analysis.
         
+        Args:
+            system_prompt: System context/instructions
+            user_prompt: The user's message
+            max_tokens: Maximum tokens in response
+            temperature: Sampling temperature
+            cache_system: Whether to cache system prompt (implementation dependent)
+            
         Returns:
-            Provider name string (e.g., "OpenAI", "Ollama", "Anthropic")
+            Response text from the LLM
         """
         pass

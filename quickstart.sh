@@ -1,83 +1,59 @@
 #!/bin/bash
-# Quick start script for the SQL injection vulnerability experiment
+# Quick start script for LLM vulnerability experiments
 
-set -e
+echo "🚀 LLM Code Generation & Vulnerability Analysis"
+echo "=============================================="
 
-echo "════════════════════════════════════════════════════════════════"
-echo "SQL Injection Vulnerability Experiment - Quick Start"
-echo "════════════════════════════════════════════════════════════════"
-echo
+# Check if we're in the right environment
+if [[ "$CONDA_DEFAULT_ENV" != "sql-vuln" ]]; then
+    echo "⚠️  Warning: Not in sql-vuln conda environment"
+    echo "   Run: conda activate sql-vuln"
+    echo ""
+fi
 
-# Check Python
-echo "✓ Checking Python installation..."
-python --version
-
-# Check pip
-echo "✓ Checking pip..."
-pip --version
-
-# Install dependencies
-echo
-echo "📦 Installing dependencies..."
-pip install -r requirements.txt
-
-# Check .env file
-echo
-echo "🔐 Checking API keys configuration..."
-if [ ! -f ".env" ]; then
-    echo "⚠ .env file not found!"
-    echo
-    echo "Please create a .env file with your API keys:"
-    echo
-    echo "1. Copy the template:"
-    cp .env.example .env 2>/dev/null || echo "   cp .env.example .env"
-    echo
-    echo "2. Edit the file with your API keys:"
-    echo "   nano .env"
-    echo
-    echo "3. Add your keys:"
-    echo "   CLAUDE_API_KEY=sk-ant-your-key-here"
-    echo "   OPENAI_API_KEY=sk-your-key-here"
-    echo
-    exit 1
+# Check for API keys
+echo "🔑 Checking API keys..."
+if [[ -z "$CLAUDE_API_KEY" ]]; then
+    echo "❌ CLAUDE_API_KEY not set"
 else
-    echo "✓ .env file found"
+    echo "✅ Claude API key found"
 fi
 
-# Check API keys
-if grep -q "sk-ant-your-claude-key-here" .env; then
-    echo "❌ CLAUDE_API_KEY not set in .env file"
-    exit 1
+if [[ -z "$GEMINI_API_KEY" ]] && [[ -z "$GOOGLE_API_KEY" ]]; then
+    echo "❌ GEMINI_API_KEY/GOOGLE_API_KEY not set"
+else
+    echo "✅ Gemini API key found"
 fi
 
-if grep -q "sk-your-openai-key-here" .env; then
-    echo "❌ OPENAI_API_KEY not set in .env file"
-    exit 1
+if [[ -z "$OPENAI_API_KEY" ]]; then
+    echo "❌ OPENAI_API_KEY not set"
+else
+    echo "✅ OpenAI API key found"
 fi
 
-echo "✓ API keys configured"
+echo ""
+echo "📋 Available experiments:"
+echo "  1. Claude → Gemini (recommended)"
+echo "  2. Gemini → Claude (baseline)"
+echo "  3. OpenAI → Claude"
+echo ""
 
-# Create experiments directory
-echo
-echo "📁 Creating experiments directory..."
-mkdir -p experiments
+read -p "Choose experiment (1-3): " choice
 
-# Run the experiment
-echo
-echo "════════════════════════════════════════════════════════════════"
-echo "Starting experiment..."
-echo "════════════════════════════════════════════════════════════════"
-echo
-
-python -m src.experiment_main 20
-
-echo
-echo "════════════════════════════════════════════════════════════════"
-echo "✓ Experiment complete!"
-echo "════════════════════════════════════════════════════════════════"
-echo
-echo "Check the 'experiments' directory for:"
-echo "  - experiment_results.json (raw data)"
-echo "  - REPORT.md (detailed report)"
-echo "  - PNG files (visualizations)"
-echo
+case $choice in
+    1)
+        echo "Running Claude → Gemini experiment..."
+        python main.py -g claude -a gemini
+        ;;
+    2)
+        echo "Running Gemini → Claude experiment..."
+        python main.py -g gemini -a claude
+        ;;
+    3)
+        echo "Running OpenAI → Claude experiment..."
+        python main.py -g openai -a claude
+        ;;
+    *)
+        echo "Invalid choice. Run: python main.py --help"
+        ;;
+esac
