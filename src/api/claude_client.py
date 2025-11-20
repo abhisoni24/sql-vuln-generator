@@ -1,9 +1,10 @@
 import os
 from anthropic import Anthropic
 from typing import Optional, List, Dict, Any
+from .base_llm_client import BaseLLMClient
 
 
-class ClaudeClient:
+class ClaudeClient(BaseLLMClient):
     """Claude/Anthropic client using the official Anthropic SDK.
 
     This uses the official Anthropic Python client library.
@@ -96,6 +97,14 @@ class ClaudeClient:
         except Exception as e:
             raise RuntimeError(f"Claude API error: {str(e)}")
 
-    def get_sql_code(self, prompt: str, max_tokens: int = 1024) -> str:
+    def get_sql_code(self, prompt: str, max_tokens: int = 1024, temperature: float = 0.0) -> str:
         """Convenience wrapper that returns the raw completion text."""
-        return self.send_prompt(prompt, max_tokens=max_tokens)
+        return self.send_prompt(prompt, max_tokens=max_tokens, temperature=temperature)
+    
+    def get_model_name(self) -> str:
+        """Get the name/identifier of the model being used."""
+        return self.model
+    
+    def get_provider_name(self) -> str:
+        """Get the name of the LLM provider."""
+        return "Anthropic"

@@ -14,13 +14,13 @@ from api.base_llm_client import BaseLLMClient
 class CodeCompletionRunner:
     """
     Orchestrates the process of completing code templates with various LLMs
-    (OpenAI GPT, Ollama Qwen, etc.) and analyzing for SQL injection vulnerabilities with Claude.
+    (OpenAI GPT, Ollama Qwen, etc.) and analyzing for SQL injection vulnerabilities.
     """
 
     def __init__(
         self, 
         code_generator_client: BaseLLMClient,
-        claude_client,
+        analyzer_client,
         sql_reference_path: str = "checks/sql/sql_owasp_reference.md"
     ):
         """
@@ -28,16 +28,18 @@ class CodeCompletionRunner:
         
         Args:
             code_generator_client: Instance of any BaseLLMClient implementation (OpenAI, Ollama, etc.)
-            claude_client: Instance of ClaudeClient for vulnerability analysis
+            analyzer_client: Instance of any client with send_prompt_with_system method for vulnerability analysis
             sql_reference_path: Path to SQL vulnerability reference markdown file
         """
         self.code_generator = code_generator_client
-        self.claude_client = claude_client
+        self.analyzer_client = analyzer_client
         self.results = []
         
         # Store provider info for reporting
         self.code_gen_provider = code_generator_client.get_provider_name()
         self.code_gen_model = code_generator_client.get_model_name()
+        self.analyzer_provider = analyzer_client.get_provider_name() if hasattr(analyzer_client, 'get_provider_name') else "Unknown"
+        self.analyzer_model = analyzer_client.get_model_name() if hasattr(analyzer_client, 'get_model_name') else "Unknown"
         
         # Load SQL vulnerability reference
         self.sql_reference = self._load_sql_reference(sql_reference_path)
@@ -172,12 +174,12 @@ Respond ONLY with valid JSON, no additional text."""
         for attempt in range(max_retries):
             try:
                 # Use cached system prompt for efficiency (90% token savings on repeated calls)
-                analysis_text = self.claude_client.send_prompt_with_system(
+                analysis_text = self.analyzer_client.send_prompt_with_system(
                     system_prompt=system_prompt,
                     user_prompt=user_prompt,
                     max_tokens=512,
                     temperature=0.0,
-                    cache_system=True  # Enable caching for the SQL reference
+                    cache_system=True  # Enable caching for the SQL reference (ignored by Gemini)
                 )
 
                 if analysis_text:
@@ -232,7 +234,7 @@ Respond ONLY with valid JSON, no additional text."""
         print("\n" + "=" * 60)
         print("CODE COMPLETION AND VULNERABILITY ANALYSIS EXPERIMENT")
         print(f"Code Generator: {self.code_gen_provider} ({self.code_gen_model})")
-        print(f"Vulnerability Analyzer: Claude (with cached SQL reference)")
+        print(f"Vulnerability Analyzer: {self.analyzer_provider} ({self.analyzer_model})")
         print("=" * 60 + "\n")
 
         total_templates = len(templates)
@@ -369,7 +371,7 @@ Respond ONLY with valid JSON, no additional text."""
             # Add metadata about the experiment
             f.write("## Experiment Configuration\n\n")
             f.write(f"- **Code Generator:** {self.code_gen_provider} ({self.code_gen_model})\n")
-            f.write(f"- **Vulnerability Analyzer:** Claude (with OWASP SQL reference)\n")
+            f.write(f"- **Vulnerability Analyzer:** {self.analyzer_provider} ({self.analyzer_model})\n")
             f.write(f"- **Analysis Approach:** Cached system prompts for efficiency\n\n")
 
             # Summary
@@ -418,7 +420,7 @@ Respond ONLY with valid JSON, no additional text."""
                     f.write("```\n\n")
 
                 analysis = result.get("analysis", {})
-                f.write("**Vulnerability Analysis (by Claude):**\n\n")
+                f.write("**Vulnerability Analysis (by {}):**\n\n".format(self.analyzer_provider))
                 f.write(
                     f"- **Vulnerable:** {result['vulnerable']}\n"
                     f"- **Type:** {analysis.get('vulnerability_type', 'N/A')}\n"

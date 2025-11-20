@@ -51,5 +51,59 @@ class GeminiClient(BaseLLMClient):
     def get_provider_name(self) -> str:
         return "Google"
 
+    def send_prompt(self, prompt: str, max_tokens: int = 1024, temperature: float = 0.0) -> str:
+        """Send a prompt to Gemini and return the response."""
+        try:
+            response = self.client.models.generate_content(
+                model=self.model,
+                contents=prompt,
+                config={
+                    "max_output_tokens": max_tokens,
+                    "temperature": temperature
+                }
+            )
+            return response.text or ""
+        except Exception as e:
+            raise RuntimeError(f"Gemini API error: {e}")
+    
+    def send_prompt_with_system(
+        self, 
+        system_prompt: str, 
+        user_prompt: str, 
+        max_tokens: int = 1024, 
+        temperature: float = 0.0,
+        cache_system: bool = False
+    ) -> str:
+        """Send a prompt with a system message to Gemini.
+        
+        Note: Gemini doesn't have a separate system message concept like Claude,
+        so we combine system and user prompts.
+        
+        Args:
+            system_prompt: The system context/instructions
+            user_prompt: The user's message
+            max_tokens: Maximum tokens in response
+            temperature: Sampling temperature
+            cache_system: Ignored for Gemini (not supported)
+            
+        Returns:
+            The response text from Gemini
+        """
+        # Combine system and user prompts since Gemini doesn't have system role
+        combined_prompt = f"{system_prompt}\n\n{user_prompt}"
+        
+        try:
+            response = self.client.models.generate_content(
+                model=self.model,
+                contents=combined_prompt,
+                config={
+                    "max_output_tokens": max_tokens,
+                    "temperature": temperature
+                }
+            )
+            return response.text or ""
+        except Exception as e:
+            raise RuntimeError(f"Gemini API error: {e}")
+
     # Legacy alias used elsewhere in project
     generate_sql = get_sql_code
