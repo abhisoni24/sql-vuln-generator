@@ -1,0 +1,76 @@
+rules:
+  - id: sql-injection-fstring-table
+    patterns:
+      - pattern: |
+          $TABLE = request.args.get(...)
+          ...
+          $QUERY = f"SELECT * FROM {$TABLE}..."
+          cursor.execute($QUERY, ...)
+    message: "SQL injection: User-controlled table name in f-string"
+    severity: ERROR
+    languages: [python]
+
+  - id: sql-injection-fstring-like
+    patterns:
+      - pattern: |
+          $KEYWORD = request.args.get(...)
+          ...
+          $QUERY = f"...LIKE '%{$KEYWORD}%'..."
+          cursor.execute($QUERY, ...)
+    message: "SQL injection: User-controlled keyword in LIKE clause"
+    severity: ERROR
+    languages: [python]
+
+  - id: sql-injection-format-columns
+    patterns:
+      - pattern: |
+          $COLUMNS = request.json.get(...)
+          ...
+          $QUERY = "SELECT {} FROM ...".format($COLUMNS)
+          cursor.execute($QUERY, ...)
+    message: "SQL injection: User-controlled column selection with format"
+    severity: ERROR
+    languages: [python]
+
+  - id: sql-injection-string-concat-where
+    patterns:
+      - pattern: |
+          $CLAUSE = request.args.get(...)
+          ...
+          $QUERY = $PREFIX + $CLAUSE
+          cursor.execute($QUERY, ...)
+    message: "SQL injection: String concatenation in SQL query"
+    severity: ERROR
+    languages: [python]
+
+  - id: sql-injection-fstring-join
+    patterns:
+      - pattern: |
+          $TABLE = request.args.get(...)
+          ...
+          $QUERY = f"...JOIN {$TABLE}..."
+          cursor.execute($QUERY, ...)
+    message: "SQL injection: User-controlled table in JOIN clause"
+    severity: ERROR
+    languages: [python]
+
+  - id: sql-injection-fstring-subquery
+    patterns:
+      - pattern: |
+          $SUBQUERY = request.args.get(...)
+          ...
+          $QUERY = f"SELECT * FROM users WHERE user_id IN ({$SUBQUERY})"
+          cursor.execute($QUERY, ...)
+    message: "SQL injection: User-controlled subquery in f-string"
+    severity: ERROR
+    languages: [python]
+
+  - id: sql-injection-direct-expression
+    patterns:
+      - pattern: |
+          $EXPR = request.json.get(...)
+          ...
+          cursor.execute($EXPR, ...)
+    message: "SQL injection: Direct execution of user-controlled expression"
+    severity: ERROR
+    languages: [python]

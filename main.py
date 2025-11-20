@@ -13,6 +13,8 @@ from typing import List, Dict
 sys.path.insert(0, str(Path(__file__).parent / "src"))
 
 from simple_experiment_runner import SimpleExperimentRunner
+from semgrep_analyzer import SemgrepAnalyzer
+from api.llm_factory import LLMFactory
 
 
 # Predefined scenario sets
@@ -93,10 +95,13 @@ Examples:
   # Run Gemini→Claude experiment
   python main.py --generator gemini --analyzer claude --scenarios vulnerable_12
 
+  # Use Semgrep for static analysis
+  python main.py --generator claude --analyzer semgrep --scenarios vulnerable_12
+
   # Custom models
   python main.py --generator claude --gen-model claude-3-5-haiku --analyzer gemini --ana-model gemini-2.5-pro
 
-Available providers: claude, gemini, openai
+Available providers: claude, gemini, openai, semgrep (for analyzer only)
 Available scenario sets: vulnerable_12
         """
     )
@@ -116,7 +121,7 @@ Available scenario sets: vulnerable_12
     parser.add_argument(
         "--analyzer", "-a",
         required=True,
-        help="LLM provider for vulnerability analysis"
+        help="LLM provider for vulnerability analysis or 'semgrep' for static analysis"
     )
 
     parser.add_argument(
@@ -151,17 +156,25 @@ Available scenario sets: vulnerable_12
 
         # Set default models if not specified
         gen_model = args.gen_model or get_default_model(args.generator)
-        ana_model = args.ana_model or get_default_model(args.analyzer)
-
+        
         print(f"Generator: {args.generator} ({gen_model})")
-        print(f"Analyzer: {args.analyzer} ({ana_model})")
+        
+        # Create generator client
+        generator_client = LLMFactory.create(args.generator, gen_model)
+        
+        # Create analyzer client
+        if args.analyzer.lower() == "semgrep":
+            analyzer_client = SemgrepAnalyzer()
+            print(f"Analyzer: Semgrep (static analysis)")
+        else:
+            ana_model = args.ana_model or get_default_model(args.analyzer)
+            analyzer_client = LLMFactory.create(args.analyzer, ana_model)
+            print(f"Analyzer: {args.analyzer} ({ana_model})")
 
         # Create and run experiment
         runner = SimpleExperimentRunner(
-            generator_provider=args.generator,
-            generator_model=gen_model,
-            analyzer_provider=args.analyzer,
-            analyzer_model=ana_model
+            generator_client=generator_client,
+            analyzer_client=analyzer_client
         )
 
         summary = runner.run_experiment(scenarios, args.name)
@@ -184,7 +197,8 @@ def get_default_model(provider: str) -> str:
     defaults = {
         'claude': 'claude-3-5-haiku-20241022',
         'gemini': 'gemini-2.5-pro',
-        'openai': 'gpt-3.5-turbo'
+        'openai': 'gpt-3.5-turbo',
+        'semgrep': 'static-analysis'  # Not used but included for completeness
     }
     return defaults.get(provider, 'default')
 

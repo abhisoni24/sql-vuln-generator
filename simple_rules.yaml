@@ -1,0 +1,7 @@
+rules:
+  - id: test-cursor-execute
+    patterns:
+      - pattern: cursor.execute(...)
+    message: "Found cursor.execute call"
+    severity: INFO
+    languages: [python]

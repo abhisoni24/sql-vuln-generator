@@ -1,0 +1,12 @@
+rules:
+  - id: sql-injection-exact
+    patterns:
+      - pattern: |
+          table_name = request.args.get('table_name')
+          keyword = request.args.get('keyword')
+          ...
+          query = f"SELECT * FROM {table_name} WHERE content LIKE '%{keyword}%'"
+          cursor.execute(query)
+    message: "SQL injection: Exact match for test case"
+    severity: ERROR
+    languages: [python]

@@ -37,9 +37,14 @@ class GeminiClient(BaseLLMClient):
         Uses `client.models.generate_content` to generate content and returns the text response.
         """
         try:
+            config = genai.types.GenerateContentConfig(
+                temperature=temperature
+                # Note: max_output_tokens removed as it can cause issues with short responses
+            )
             response = self.client.models.generate_content(
                 model=self.model,
-                contents=prompt
+                contents=prompt,
+                config=config
             )
             return response.text or ""
         except Exception as e:
@@ -54,13 +59,14 @@ class GeminiClient(BaseLLMClient):
     def send_prompt(self, prompt: str, max_tokens: int = 1024, temperature: float = 0.0) -> str:
         """Send a prompt to Gemini and return the response."""
         try:
+            config = genai.types.GenerateContentConfig(
+                temperature=temperature
+                # Note: max_output_tokens removed as it can cause issues with short responses
+            )
             response = self.client.models.generate_content(
                 model=self.model,
                 contents=prompt,
-                config={
-                    "max_output_tokens": max_tokens,
-                    "temperature": temperature
-                }
+                config=config
             )
             return response.text or ""
         except Exception as e:
@@ -76,8 +82,7 @@ class GeminiClient(BaseLLMClient):
     ) -> str:
         """Send a prompt with a system message to Gemini.
         
-        Note: Gemini doesn't have a separate system message concept like Claude,
-        so we combine system and user prompts.
+        Uses the system_instruction parameter in the config for proper system message handling.
         
         Args:
             system_prompt: The system context/instructions
@@ -89,17 +94,16 @@ class GeminiClient(BaseLLMClient):
         Returns:
             The response text from Gemini
         """
-        # Combine system and user prompts since Gemini doesn't have system role
-        combined_prompt = f"{system_prompt}\n\n{user_prompt}"
-        
         try:
+            config = genai.types.GenerateContentConfig(
+                temperature=temperature,
+                system_instruction=system_prompt
+                # Note: max_output_tokens removed as it can cause issues with short responses
+            )
             response = self.client.models.generate_content(
                 model=self.model,
-                contents=combined_prompt,
-                config={
-                    "max_output_tokens": max_tokens,
-                    "temperature": temperature
-                }
+                contents=user_prompt,
+                config=config
             )
             return response.text or ""
         except Exception as e:

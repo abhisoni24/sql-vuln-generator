@@ -1,0 +1,11 @@
+rules:
+  - id: sql-injection-test
+    patterns:
+      - pattern: |
+          $TABLE = request.args.get('table_name')
+          $KEYWORD = request.args.get('keyword')
+          ...
+          cursor.execute(f"SELECT * FROM {$TABLE} WHERE content LIKE '%{$KEYWORD}%'", ...)
+    message: "SQL injection test"
+    severity: ERROR
+    languages: [python]

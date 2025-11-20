@@ -1,0 +1,10 @@
+rules:
+  - id: fstring-cursor
+    patterns:
+      - pattern: |
+          $VAR1 = request.args.get(...)
+          ...
+          cursor.execute(f"...{$VAR1}...", ...)
+    message: "cursor.execute with f-string containing request variable"
+    severity: ERROR
+    languages: [python]
