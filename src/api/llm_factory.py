@@ -7,6 +7,7 @@ from .base_llm_client import BaseLLMClient
 from .claude_client import ClaudeClient
 from .gemini_client import GeminiClient
 from .openai_client import OpenAIClient
+from .ollama_client import OllamaClient
 
 
 class LLMFactory:
@@ -16,6 +17,7 @@ class LLMFactory:
         'claude': ClaudeClient,
         'gemini': GeminiClient,
         'openai': OpenAIClient,
+        'ollama': OllamaClient,
     }
 
     @staticmethod

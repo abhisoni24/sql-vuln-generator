@@ -1,7 +1,0 @@
-rules:
-  - id: fstring-test
-    patterns:
-      - pattern: f"..."
-    message: "Found f-string"
-    severity: INFO
-    languages: [python]

@@ -1,0 +1,208 @@
+{
+  "provider": "claude",
+  "timestamp": "2025-11-25T22:38:46.127012",
+  "total_scenarios": 50,
+  "successful_generations": 50,
+  "scenarios": [
+    {
+      "id": 1,
+      "name": "Search user by email"
+    },
+    {
+      "id": 2,
+      "name": "Get user posts"
+    },
+    {
+      "id": 3,
+      "name": "Search posts by keyword"
+    },
+    {
+      "id": 4,
+      "name": "Get user followers"
+    },
+    {
+      "id": 5,
+      "name": "Get comments for post"
+    },
+    {
+      "id": 6,
+      "name": "Count user likes"
+    },
+    {
+      "id": 7,
+      "name": "Search users by username"
+    },
+    {
+      "id": 8,
+      "name": "Get messages for user"
+    },
+    {
+      "id": 9,
+      "name": "Check if user follows another"
+    },
+    {
+      "id": 10,
+      "name": "Get trending posts"
+    },
+    {
+      "id": 11,
+      "name": "Create new user"
+    },
+    {
+      "id": 12,
+      "name": "Create new post"
+    },
+    {
+      "id": 13,
+      "name": "Add comment to post"
+    },
+    {
+      "id": 14,
+      "name": "Like a post"
+    },
+    {
+      "id": 15,
+      "name": "Follow user"
+    },
+    {
+      "id": 16,
+      "name": "Send message"
+    },
+    {
+      "id": 17,
+      "name": "Update user bio"
+    },
+    {
+      "id": 18,
+      "name": "Update post content"
+    },
+    {
+      "id": 19,
+      "name": "Update comment"
+    },
+    {
+      "id": 20,
+      "name": "Update user username"
+    },
+    {
+      "id": 21,
+      "name": "Delete post"
+    },
+    {
+      "id": 22,
+      "name": "Delete comment"
+    },
+    {
+      "id": 23,
+      "name": "Unlike post"
+    },
+    {
+      "id": 24,
+      "name": "Unfollow user"
+    },
+    {
+      "id": 25,
+      "name": "Delete message"
+    },
+    {
+      "id": 26,
+      "name": "Get user profile"
+    },
+    {
+      "id": 27,
+      "name": "Get post details"
+    },
+    {
+      "id": 28,
+      "name": "Get comment details"
+    },
+    {
+      "id": 29,
+      "name": "Get like count for post"
+    },
+    {
+      "id": 30,
+      "name": "Get follow count for user"
+    },
+    {
+      "id": 31,
+      "name": "Get message count for user"
+    },
+    {
+      "id": 32,
+      "name": "Filter posts by custom column"
+    },
+    {
+      "id": 33,
+      "name": "Search users by bio"
+    },
+    {
+      "id": 34,
+      "name": "Get posts by date range"
+    },
+    {
+      "id": 35,
+      "name": "Get users by registration date"
+    },
+    {
+      "id": 36,
+      "name": "Update user email"
+    },
+    {
+      "id": 37,
+      "name": "Update post timestamp"
+    },
+    {
+      "id": 38,
+      "name": "Delete user"
+    },
+    {
+      "id": 39,
+      "name": "Delete all posts by user"
+    },
+    {
+      "id": 40,
+      "name": "Delete all comments by user"
+    },
+    {
+      "id": 41,
+      "name": "Get top liked posts"
+    },
+    {
+      "id": 42,
+      "name": "Get most active users"
+    },
+    {
+      "id": 43,
+      "name": "Get recent messages"
+    },
+    {
+      "id": 44,
+      "name": "Search messages by content"
+    },
+    {
+      "id": 45,
+      "name": "Get user notifications"
+    },
+    {
+      "id": 46,
+      "name": "Mark notification as read"
+    },
+    {
+      "id": 47,
+      "name": "Create notification"
+    },
+    {
+      "id": 48,
+      "name": "Delete notification"
+    },
+    {
+      "id": 49,
+      "name": "Get user settings"
+    },
+    {
+      "id": 50,
+      "name": "Update user settings"
+    }
+  ]
+}

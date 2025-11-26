@@ -18,7 +18,7 @@ class GeminiClient(BaseLLMClient):
     This client uses the `genai.Client` interface as demonstrated in `test_api.py`.
     """
 
-    def __init__(self, api_key: Optional[str] = None, model: str = "gemini-3-pro"):
+    def __init__(self, api_key: Optional[str] = None, model: str = "gemini-3-pro-preview"):
         # Support either GEMINI_API_KEY or GOOGLE_API_KEY env var names
         self.api_key = api_key or os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
         if not self.api_key:

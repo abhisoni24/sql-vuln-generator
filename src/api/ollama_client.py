@@ -20,7 +20,7 @@ class OllamaClient(BaseLLMClient):
     
     def __init__(
         self, 
-        model: str = "qwen2.5-coder:7b",
+        model: str = "qwen3:8b",
         base_url: Optional[str] = None,
         context_window: int = 8192,
         temperature: float = 0.0
@@ -44,7 +44,7 @@ class OllamaClient(BaseLLMClient):
     def get_sql_code(
         self, 
         prompt: str, 
-        max_tokens: int = 1024, 
+        max_tokens: int = 2048, 
         temperature: float = 0.0
     ) -> str:
         """
@@ -52,7 +52,7 @@ class OllamaClient(BaseLLMClient):
         
         Args:
             prompt: The prompt describing the code to generate
-            max_tokens: Maximum number of tokens in the response
+            max_tokens: Maximum number of tokens in the response (ignored - let model decide)
             temperature: Sampling temperature
             
         Returns:
@@ -70,25 +70,29 @@ class OllamaClient(BaseLLMClient):
                 "stream": False,  # Critical: disable streaming
                 "options": {
                     "temperature": temperature,
-                    "num_predict": max_tokens,
                     "num_ctx": self.context_window
+                    # Note: removed num_predict to let model generate complete responses
                 }
             }
             
-            # Make request with generous timeout
-            response = requests.post(url, json=payload, timeout=180)
+            # Make request with generous timeout (Ollama can be slow)
+            response = requests.post(url, json=payload, timeout=300)
             response.raise_for_status()
             
             # Extract response
             result = response.json()
             generated_text = result.get("response", "")
             
+            if not generated_text or generated_text.isspace():
+                print(f"  ✗ Empty response from Ollama")
+                return ""
+            
             print(f"  ✓ Received response from Ollama ({len(generated_text)} chars)")
             
-            return generated_text.strip() if generated_text else ""
+            return generated_text.strip()
             
         except requests.Timeout:
-            print(f"  ✗ Timeout waiting for Ollama (180s)")
+            print(f"  ✗ Timeout waiting for Ollama (300s) - model might be too slow")
             return ""
         except requests.RequestException as e:
             print(f"  ✗ HTTP error: {e}")
@@ -106,6 +110,31 @@ class OllamaClient(BaseLLMClient):
     def get_provider_name(self) -> str:
         """Get the provider name."""
         return "Ollama"
+    
+    def send_prompt_with_system(
+        self,
+        system_prompt: str,
+        user_prompt: str,
+        max_tokens: int = 1024,
+        temperature: float = 0.0,
+        cache_system: bool = False
+    ) -> str:
+        """
+        Send a prompt with system context to Ollama.
+        
+        Args:
+            system_prompt: The system/context instructions
+            user_prompt: The user's message/prompt
+            max_tokens: Maximum tokens in response
+            temperature: Sampling temperature
+            cache_system: Ignored for Ollama
+            
+        Returns:
+            Generated text as a string
+        """
+        # Combine system and user prompts
+        combined_prompt = f"{system_prompt}\n\n{user_prompt}"
+        return self.get_sql_code(combined_prompt, max_tokens, temperature)
     
     # Legacy compatibility
     generate_sql = get_sql_code
