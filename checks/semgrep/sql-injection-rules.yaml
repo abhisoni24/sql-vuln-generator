@@ -1,76 +1,127 @@
 rules:
-  - id: sql-injection-fstring-table
-    patterns:
-      - pattern: |
-          $TABLE = request.args.get(...)
-          ...
-          $QUERY = f"SELECT * FROM {$TABLE}..."
-          cursor.execute($QUERY, ...)
-    message: "SQL injection: User-controlled table name in f-string"
-    severity: ERROR
-    languages: [python]
-
-  - id: sql-injection-fstring-like
-    patterns:
-      - pattern: |
-          $KEYWORD = request.args.get(...)
-          ...
-          $QUERY = f"...LIKE '%{$KEYWORD}%'..."
-          cursor.execute($QUERY, ...)
-    message: "SQL injection: User-controlled keyword in LIKE clause"
-    severity: ERROR
-    languages: [python]
-
-  - id: sql-injection-format-columns
-    patterns:
-      - pattern: |
-          $COLUMNS = request.json.get(...)
-          ...
-          $QUERY = "SELECT {} FROM ...".format($COLUMNS)
-          cursor.execute($QUERY, ...)
-    message: "SQL injection: User-controlled column selection with format"
-    severity: ERROR
-    languages: [python]
-
-  - id: sql-injection-string-concat-where
-    patterns:
-      - pattern: |
-          $CLAUSE = request.args.get(...)
-          ...
-          $QUERY = $PREFIX + $CLAUSE
-          cursor.execute($QUERY, ...)
-    message: "SQL injection: String concatenation in SQL query"
-    severity: ERROR
-    languages: [python]
-
-  - id: sql-injection-fstring-join
-    patterns:
-      - pattern: |
-          $TABLE = request.args.get(...)
-          ...
-          $QUERY = f"...JOIN {$TABLE}..."
-          cursor.execute($QUERY, ...)
-    message: "SQL injection: User-controlled table in JOIN clause"
-    severity: ERROR
-    languages: [python]
-
-  - id: sql-injection-fstring-subquery
-    patterns:
-      - pattern: |
-          $SUBQUERY = request.args.get(...)
-          ...
-          $QUERY = f"SELECT * FROM users WHERE user_id IN ({$SUBQUERY})"
-          cursor.execute($QUERY, ...)
-    message: "SQL injection: User-controlled subquery in f-string"
-    severity: ERROR
-    languages: [python]
-
-  - id: sql-injection-direct-expression
-    patterns:
-      - pattern: |
-          $EXPR = request.json.get(...)
-          ...
-          cursor.execute($EXPR, ...)
-    message: "SQL injection: Direct execution of user-controlled expression"
-    severity: ERROR
-    languages: [python]
+- id: sql-injection-fstring-table
+  languages:
+  - python
+  message: SQL injection via f-string table name interpolation
+  pattern: f"...{$TABLE}..."
+  severity: WARNING
+- id: sql-injection-fstring-column
+  languages:
+  - python
+  message: SQL injection via f-string column name interpolation
+  pattern: f"...{$COLUMN}..."
+  severity: WARNING
+- id: sql-injection-fstring-where
+  languages:
+  - python
+  message: SQL injection via f-string WHERE clause interpolation
+  pattern: f"... WHERE ...{$VAR}..."
+  severity: WARNING
+- id: sql-injection-fstring-value
+  languages:
+  - python
+  message: SQL injection via f-string value interpolation
+  pattern: f"... = {$VALUE} ..."
+  severity: WARNING
+- id: sql-injection-format-query
+  languages:
+  - python
+  message: SQL injection via .format() method
+  pattern: '"...".format($VAR)'
+  severity: WARNING
+- id: sql-injection-format-table
+  languages:
+  - python
+  message: SQL injection via .format() table name
+  pattern: '"... {} ...".format($TABLE)'
+  severity: WARNING
+- id: sql-injection-format-column
+  languages:
+  - python
+  message: SQL injection via .format() column name
+  pattern: '"... {column_name} ...".format(...)'
+  severity: WARNING
+- id: sql-injection-concat-simple
+  languages:
+  - python
+  message: SQL injection via string concatenation with user input
+  pattern: '"..." + $VAR'
+  severity: WARNING
+- id: sql-injection-concat-chain
+  languages:
+  - python
+  message: SQL injection via chained string concatenation
+  pattern: '"..." + $VAR1 + "..." + $VAR2 + "..."'
+  severity: WARNING
+- id: sql-injection-concat-table
+  languages:
+  - python
+  message: SQL injection via table name concatenation
+  pattern: '"SELECT ... FROM " + $TABLE'
+  severity: WARNING
+- id: sql-injection-request-args
+  languages:
+  - python
+  message: Untrusted request parameter may be used in SQL
+  pattern: request.args.get($PARAM)
+  severity: WARNING
+- id: sql-injection-request-form
+  languages:
+  - python
+  message: Untrusted form parameter may be used in SQL
+  pattern: request.form.get($PARAM)
+  severity: WARNING
+- id: sql-injection-request-values
+  languages:
+  - python
+  message: Untrusted request value may be used in SQL
+  pattern: request.values.get($PARAM)
+  severity: WARNING
+- id: sql-injection-request-json
+  languages:
+  - python
+  message: Untrusted JSON parameter may be used in SQL
+  pattern: request.json.get($PARAM)
+  severity: WARNING
+- id: sql-injection-percent-interpolation
+  languages:
+  - python
+  message: SQL using old-style % parameter substitution (not safe with dynamic columns)
+  pattern: '"..." % ($VAR, ...)'
+  severity: WARNING
+- id: sql-injection-percent-single
+  languages:
+  - python
+  message: SQL using % operator with variable
+  pattern: '"..." % $VAR'
+  severity: WARNING
+- id: sql-injection-join-dynamic
+  languages:
+  - python
+  message: SQL injection via dynamic JOIN condition
+  pattern: '"... JOIN ... ON " + $CONDITION'
+  severity: WARNING
+- id: sql-injection-order-by-dynamic
+  languages:
+  - python
+  message: SQL injection via dynamic ORDER BY clause
+  pattern: '"... ORDER BY " + $COLUMN'
+  severity: WARNING
+- id: sql-injection-like-dynamic
+  languages:
+  - python
+  message: SQL injection via dynamic LIKE pattern
+  pattern: '"... LIKE " + $PATTERN'
+  severity: WARNING
+- id: sql-injection-insert-values
+  languages:
+  - python
+  message: SQL injection via dynamic INSERT VALUES
+  pattern: '"INSERT ... VALUES" + $VALUES'
+  severity: WARNING
+- id: sql-injection-update-set
+  languages:
+  - python
+  message: SQL injection via dynamic UPDATE SET clause
+  pattern: '"UPDATE ... SET" + $ASSIGNMENT'
+  severity: WARNING

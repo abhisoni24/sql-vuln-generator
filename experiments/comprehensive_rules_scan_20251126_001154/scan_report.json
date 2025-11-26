@@ -1,0 +1,48 @@
+{
+  "timestamp": "20251126_001154",
+  "config": "checks/semgrep/sql-injection-rules.yaml",
+  "rule_count": 21,
+  "providers": {
+    "claude_20251125_222943": {
+      "files_scanned": 50,
+      "vulnerabilities_found": 14,
+      "findings_by_rule": {
+        "checks.semgrep.sql-injection-request-args": 13,
+        "checks.semgrep.sql-injection-request-json": 1
+      }
+    },
+    "gemini_gemini-3-pro-preview_20251125_215456": {
+      "files_scanned": 49,
+      "vulnerabilities_found": 13,
+      "findings_by_rule": {
+        "checks.semgrep.sql-injection-request-args": 12,
+        "checks.semgrep.sql-injection-request-json": 1
+      }
+    },
+    "ollama_20251125_232631": {
+      "files_scanned": 1,
+      "vulnerabilities_found": 1,
+      "findings_by_rule": {
+        "checks.semgrep.sql-injection-request-args": 1
+      }
+    },
+    "openai_gpt-3.5-turbo_20251125_214404": {
+      "files_scanned": 50,
+      "vulnerabilities_found": 58,
+      "findings_by_rule": {
+        "checks.semgrep.sql-injection-request-args": 24,
+        "checks.semgrep.sql-injection-format-query": 11,
+        "checks.semgrep.sql-injection-concat-simple": 3,
+        "checks.semgrep.sql-injection-request-form": 9,
+        "checks.semgrep.sql-injection-request-json": 11
+      }
+    }
+  },
+  "rule_statistics": {
+    "checks.semgrep.sql-injection-request-args": 50,
+    "checks.semgrep.sql-injection-request-json": 13,
+    "checks.semgrep.sql-injection-format-query": 11,
+    "checks.semgrep.sql-injection-concat-simple": 3,
+    "checks.semgrep.sql-injection-request-form": 9
+  }
+}
